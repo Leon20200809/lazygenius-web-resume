@@ -1,53 +1,80 @@
-// page.tsx トップページ
-import { fetchCareersCsv } from "@/lib/fetch-careers-csv";
-import { parseCareersCsv } from "@/lib/parse-careers-csv";
+// app/page.tsx
+// 役割: 採用担当者向けトップページ
+// - 履歴書PDF導線
+// - 職務経歴書PDF導線
+// - Web版プロフィール導線
 
 export default async function Home() {
-  const csv_text = await fetchCareersCsv();
-
-  const careers = parseCareersCsv(csv_text);
-
   return (
-    <main className="mx-auto max-w-4xl p-8">
-      <h1 className="text-3xl font-bold underline text-red-500">
-        careers CSV 取得テスト
-      </h1>
+    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
+      <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
+        {/* 肩書き */}
+        <p className="mb-4 text-sm font-semibold tracking-[0.18em] text-[var(--color-accent)] uppercase">
+          Web Resume
+        </p>
 
-      <pre>{JSON.stringify(careers.slice(0, 3), null, 2)}</pre>
+        {/* タイトル */}
+        <h1 className="mb-4 text-[length:var(--fs-2xl)] font-bold tracking-tight">
+          Leon.C
+        </h1>
 
-      <div className="space-y-4">
-        {careers.map((career) => (
-          <section
-            key={career.id}
-            className="rounded-2xl border border-zinc-700 bg-zinc-900 p-6 shadow"
+        {/* キャッチ */}
+        <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
+          ご覧いただきありがとうございます。
+        </p>
+
+        {/* <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
+          フルスタック志向エンジニア
+        </p> */}
+
+        <p className="mb-10 max-w-2xl text-[length:var(--fs-base)] leading-relaxed text-[var(--color-muted)]">
+          PHP / WordPress / Laravel / Next.js を軸に、
+          実務で使える仕組みを設計・実装しています。
+        </p>
+
+        {/* 導線 */}
+        <div className="grid w-full gap-4">
+          <a
+            href="/print/resume"
+            target="_blank"
+            className="rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)]"
           >
-            <h2 className="mb-2 text-2xl font-bold text-cyan-300">
-              {career.company}
-            </h2>
+            履歴書をダウンロード
+          </a>
 
-            <p className="mb-2 text-lg text-zinc-200">{career.role}</p>
+          <a
+            href="/print/career"
+            target="_blank"
+            className="rounded-[var(--radius-l)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)]"
+          >
+            職務経歴書をダウンロード
+          </a>
 
-            <p className="text-sm text-zinc-400">
-              {career.period_start} ～ {career.period_end}
-            </p>
-          </section>
-        ))}
-      </div>
+          <a
+            href="/resume"
+            className="rounded-[var(--radius-l)] border border-[var(--color-border)] px-6 py-4 font-bold text-[var(--color-text)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-surface)]"
+          >
+            Web版を見る
+          </a>
+        </div>
 
-      {/* 印刷ページリンク */}
-      <div className="my-8 flex justify-center">
-        <a
-          href="/print/resume"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex rounded-lg bg-zinc-900 px-4 py-2 text-white"
-        >
-          履歴書を印刷
-        </a>
-      </div>
-      
+        {/* 技術スタック */}
+        <p className="mt-10 text-sm text-[var(--color-muted)]">
+          PHP / WordPress / Laravel / Next.js / TypeScript
+        </p>
 
-      <p className="mt-8 text-sm text-zinc-500">LazyGenius Resume Platform</p>
+        {/* 外部導線 */}
+        <div className="mt-6">
+          <a
+            href="https://lazygenius.dev"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 transition hover:text-[var(--color-accent-hover)]"
+          >
+            設計思想・制作実績を見る（個人サイト）を見る
+          </a>
+        </div>
+      </section>
     </main>
   );
 }

@@ -25,6 +25,90 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* -----------------------------------------
+  globals.css — LG Resume Design Tokens
+  役割:
+  - プロジェクト全体の定数管理
+  - Tailwindと併用（レイアウトはTailwind、思想はここ）
+------------------------------------------*/
+
+@layer base {
+  :root {
+    /* ===== Font ===== */
+    --font-heading: "Inter", "Noto Sans JP", sans-serif;
+    --font-body: "Noto Sans JP", "Inter", sans-serif;
+
+    /* ===== Color (Resume Theme) ===== */
+    --color-bg: #0f172a; /* 背景（濃紺） */
+    --color-bg-alt: #111827; /* サブ背景 */
+    --color-surface: #1e293b; /* カード・セクション */
+    --color-text: #f8fafc; /* メイン文字 */
+    --color-muted: #94a3b8; /* 補助文字 */
+    --color-accent: #38bdf8; /* アクセント（信頼ブルー） */
+    --color-accent-hover: #0ea5e9;
+    --color-border: #334155;
+
+    /* ===== Button ===== */
+    --btn-primary: var(--color-accent);
+    --btn-secondary: #cbd5f5;
+    --btn-bg: #ffffff;
+
+    /* ===== Fluid Typography ===== */
+    --fs-xs: clamp(0.75rem, 0.7rem + 0.1vw, 0.8125rem);
+    --fs-sm: clamp(0.875rem, 0.8rem + 0.2vw, 0.9375rem);
+    --fs-base: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+    --fs-lg: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+    --fs-xl: clamp(1.75rem, 1.5rem + 2vw, 2.5rem);
+    --fs-2xl: clamp(2.25rem, 2rem + 4vw, 3.25rem);
+
+    /* ===== Spacing ===== */
+    --space-xs: 0.5rem;
+    --space-s: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
+    --space-m: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+    --space-l: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+    --space-xl: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+    --space-2xl: clamp(3rem, 2rem + 5vw, 5rem);
+
+    /* ===== Radius ===== */
+    --radius-s: 0.25rem;
+    --radius-m: 0.5rem;
+    --radius-l: 0.75rem;
+
+    /* ===== Motion ===== */
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur: 200ms;
+
+    /* ===== Layout ===== */
+    --container-width: 72rem;
+    --container-width-sp: 22rem;
+
+    /* ===== Header ===== */
+    --header-height: 4rem;
+    --header-z-index: 1000;
+    --nav-z-index: 1100;
+    --anchor-offset: 5rem;
+
+    /* ===== Glass / Overlay ===== */
+    --color-bg-glass: rgba(15, 23, 42, 0.85);
+    --color-bg-panel: rgba(30, 41, 59, 0.95);
+    --color-border-light: rgba(255, 255, 255, 0.08);
+
+    /* ===== Shadow ===== */
+    --shadow-m: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+    --shadow-l: 0 1rem 2rem rgba(0, 0, 0, 0.35);
+
+    /* ===== Focus ===== */
+    --focus-ring: 0 0 0 2px rgba(56, 189, 248, 0.5);
+
+    /* ===== Hamburger ===== */
+    --hamburger-size: 2.5rem;
+    --hamburger-line-width: 1.5rem;
+    --hamburger-line-height: 0.125rem;
+    --hamburger-gap: 0.375rem;
+    --hamburger-shift: 0.5rem;
+  }
+}
+
 /* A4印刷用 */
 @media print {
   @page {

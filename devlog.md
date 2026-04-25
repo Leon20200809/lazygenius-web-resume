@@ -35,3 +35,28 @@
 * 構成変更後の404やimport不具合も、まず再起動を疑う
 * 印刷機能は HTML を整え、最後はブラウザ印刷に任せる
 * 自分たちの責任範囲は「A4できれいに崩れないPDFを作る」こと
+
+データフロー
+[Google Sheets]
+        ↓
+ fetchSheetCsv()
+        ↓
+[CSV文字列]
+        ↓
+ parseCsvTextToRows()
+        ↓
+[rows配列]
+        ↓
+ parseProfileCsv()
+        ↓
+[profileオブジェクト]
+        ↓
+ page.tsx
+        ↓
+[画面表示]
+
+① 入力（CSV）
+② 中間（rows）
+③ 出力（profile）
+
+この3点ログだけでデバッグできるようになる。
