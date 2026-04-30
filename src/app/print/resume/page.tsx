@@ -1,12 +1,12 @@
 // src/app/print/resume/page.tsx
-import { fetchSheetCsv } from "@/lib/fetch-sheet-csv";
-import { parseProfileCsv } from "@/lib/parse-profile-csv";
+import { buildResumeData } from "@/lib/build-resume-data";
+
 import { PrintButton } from "@/components/print/print-button";
 
-const profile_csv = await fetchSheetCsv("profile");
-const profile = parseProfileCsv(profile_csv);
 
-export default function PrintResumePage() {
+export default async function PrintResumePage() {
+  const resume = await buildResumeData();
+
   return (
     <>
       <div>
@@ -20,11 +20,19 @@ export default function PrintResumePage() {
           <div>
             <p className="text-sm">氏名</p>
             <p className="border-b border-black py-2 text-xl font-semibold">
-              {profile.name}
+              {resume.profile.name}
             </p>
           </div>
         </section>
       </main>
+
+      <pre className="bg-gray-100 p-4 rounded overflow-auto">
+        {JSON.stringify(resume.education, null, 2)}
+      </pre>
+
+      <pre className="bg-gray-100 p-4 rounded overflow-auto">
+        {/* {JSON.stringify(education, null, 2)} */}
+      </pre>
     </>
   );
 }
