@@ -37,7 +37,7 @@ export default async function Home() {
           <a
             href="/print/resume"
             target="_blank"
-            className="rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)]"
+            className="rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)] hover:brightness-110 active:scale-[0.98]"
           >
             履歴書をダウンロード
           </a>
@@ -45,14 +45,14 @@ export default async function Home() {
           <a
             href="/print/career"
             target="_blank"
-            className="rounded-[var(--radius-l)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)]"
+            className="rounded-[var(--radius-l)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)] active:scale-[0.98]"
           >
             職務経歴書をダウンロード
           </a>
 
           <a
             href="/resume"
-            className="rounded-[var(--radius-l)] border border-[var(--color-border)] px-6 py-4 font-bold text-[var(--color-text)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-surface)]"
+            className="rounded-[var(--radius-l)] border border-[var(--color-border)] px-6 py-4 font-bold text-[var(--color-text)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-surface)] active:scale-[0.98]"
           >
             Web版を見る
           </a>
