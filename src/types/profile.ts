@@ -1,5 +1,5 @@
 // src/types/profile.ts → Profile型・empty_profile
-export type Profile = {
+export interface Profile {
   name: string;
   furigana: string;
   title: string;
@@ -21,8 +21,9 @@ export type Profile = {
   dependents: string;
   spouse: string;
   spouse_support: string;
-};
+}
 
+// 縦持ちデータ（key-value形式）は空データを作る 縦持ちデータをProfileへ組み立てるため
 export const empty_profile: Profile = {
   name: "",
   furigana: "",

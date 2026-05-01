@@ -4,6 +4,8 @@ const SPREADSHEET_ID = "1hZGl7nRKstVKCmEJQh3EJf-_D24BJQSNiO_DdGktoz0";
 const SHEETS = {
   profile: "1849835023",
   education: "1886713664",
+  career: "255949518",
+  certification: "1879285802",
 } as const;
 
 export async function fetchSheetCsv(sheetName: keyof typeof SHEETS): Promise<string> {

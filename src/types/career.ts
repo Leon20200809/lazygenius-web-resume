@@ -1,4 +1,5 @@
-export type Career = {
+// src/types/career.ts
+export interface Career {
   id: string;
   status: string;
   company: string;
@@ -15,4 +16,4 @@ export type Career = {
   tech_stack: string;
   print_summary: string;
   sort: string;
-};
+}

@@ -1,13 +1,13 @@
 // src/lib/parse-profile-csv.ts → profile CSVをProfileに変換
 import { parseCsvTextToRows } from "@/lib/parse-csv-text-to-rows";
-import type { Profile } from "@/types/profile";
+import { Profile } from "@/types/profile";
 import { empty_profile } from "@/types/profile";
 
 
 // Key-Value形式（縦持ち）
 export function parseProfileCsv(csv_text: string): Profile {
   const rows = parseCsvTextToRows(csv_text);
-  console.log("【parseProfileCsv rows】", rows.slice(0, 5));
+  // console.log("【parseProfileCsv rows】", rows.slice(0, 5));
   const profile = { ...empty_profile };
 
   rows.forEach((row) => {

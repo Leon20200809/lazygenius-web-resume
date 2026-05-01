@@ -1,5 +1,5 @@
 // src/types/education.ts
-export type Education = {
+export interface Education {
   id: string;
   status: string;
   school_name: string;
@@ -11,4 +11,4 @@ export type Education = {
   summary: string;
   print_summary: string;
   sort: string;
-};
+}

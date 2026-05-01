@@ -4,21 +4,29 @@ import { fetchSheetCsv } from "@/lib/fetch-sheet-csv";
 
 import { parseProfileCsv } from "@/lib/parse-profile-csv";
 import { parseEducationCsv } from "@/lib/parse-education-csv";
+import { parseCareerCsv } from "@/lib/parse-career-csv";
+import { parseCertificationCsv } from "@/lib/parse-certification";
 
 import { ResumeData } from "@/types/resume";
 
 export async function buildResumeData(): Promise<ResumeData> {
     // Promise.all: 複数の処理を同時並行でやれ
-  const [profile_csv, education_csv] = await Promise.all([
+  const [profile_csv, education_csv, career_csv, certification_csv, ] = await Promise.all([
     fetchSheetCsv("profile"),
     fetchSheetCsv("education"),
+    fetchSheetCsv("career"),
+    fetchSheetCsv("certification"),
   ]);
 
   const profile = parseProfileCsv(profile_csv);
   const education = parseEducationCsv(education_csv);
+  const career = parseCareerCsv(career_csv);
+  const certification = parseCertificationCsv(certification_csv);
 
   return{
     profile,
     education,
+    career,
+    certification,
   }
 }
