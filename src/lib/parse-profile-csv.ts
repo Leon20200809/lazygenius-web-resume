@@ -1,6 +1,6 @@
 // src/lib/parse-profile-csv.ts → profile CSVをProfileに変換
 import { parseCsvTextToRows } from "@/lib/parse-csv-text-to-rows";
-import { Profile } from "@/types/profile";
+import type { Profile } from "@/types/profile";
 import { empty_profile } from "@/types/profile";
 
 

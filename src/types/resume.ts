@@ -9,4 +9,4 @@ export interface ResumeData {
   education: Education[];
   career: Career[];
   certification: Certification[];
-};
+}

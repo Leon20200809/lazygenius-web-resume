@@ -1,6 +1,6 @@
 // parse-certification.ts
 import { parseCsvTextToRows } from "@/lib/parse-csv-text-to-rows";
-import { Certification } from "@/types/certification";
+import type { Certification } from "@/types/certification";
 
 export function parseCertificationCsv(csv_text: string): Certification[] {
   const rows = parseCsvTextToRows(csv_text);
