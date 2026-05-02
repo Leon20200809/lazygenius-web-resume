@@ -3,6 +3,7 @@
 // src/app/reply/page.tsx
 
 import { useState } from "react";
+import { ReactNode } from "react";
 
 type SelectionResult = "passed" | "rejected" | "";
 
@@ -16,7 +17,88 @@ export default function ReplyPage() {
   const [passed_note, setPassedNote] = useState("");
   const [rejection_reason, setRejectionReason] = useState("");
   const [improvement_points, setImprovementPoints] = useState("");
+
   const [preview_message, setPreviewMessage] = useState("");
+  const [copy_message, setCopyMessage] = useState("");
+
+  const [error_message, setErrorMessage] = useState("");
+
+  let selection_fields: ReactNode = null;
+
+  {/* 書類通過：面談候補日 + 補足 */}
+  if (selection_result === "passed") {
+    selection_fields = (
+      <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
+        <div className="space-y-2">
+          <label htmlFor="interview_dates" className="text-sm font-bold">
+            面談候補日
+          </label>
+          <textarea
+            id="interview_dates"
+            name="interview_dates"
+            rows={4}
+            placeholder={`例：○○月○○日（曜日）10:00〜12:00`}
+            value={interview_dates}
+            onChange={(e) => setInterviewDates(e.target.value)}
+            className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="passed_note" className="text-sm font-bold">
+            補足メッセージ
+          </label>
+          <textarea
+            id="passed_note"
+            name="passed_note"
+            rows={4}
+            placeholder="面談形式、所要時間、事前準備などがあればご記入ください。"
+            value={passed_note}
+            onChange={(e) => setPassedNote(e.target.value)}
+            className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  {/* お見送り：理由 + 課題点 */}
+  if (selection_result === "rejected") {
+    selection_fields = (
+      <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
+        <div className="space-y-2">
+          <label htmlFor="rejection_reason" className="text-sm font-bold">
+            お見送り理由
+            <span className="ml-2 text-xs text-red-400">必須</span>
+          </label>
+          <textarea
+            id="rejection_reason"
+            name="rejection_reason"
+            rows={5}
+            placeholder="お見送りの理由をご記入ください。"
+            value={rejection_reason}
+            onChange={(e) => setRejectionReason(e.target.value)}
+            className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="improvement_points" className="text-sm font-bold">
+            課題点・改善するとよい点
+          </label>
+          <textarea
+            id="improvement_points"
+            name="improvement_points"
+            rows={5}
+            placeholder="今後改善するとよい点、足りなかった経験・スキルなどがあればご記入ください。"
+            value={improvement_points}
+            onChange={(e) => setImprovementPoints(e.target.value)}
+            className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)] px-6 py-12 text-[var(--color-text)]">
@@ -126,87 +208,18 @@ export default function ReplyPage() {
               )}
             </fieldset>
 
-            {/* 書類通過：面談候補日 + 補足 */}
-            {selection_result === "passed" && (
-              <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="interview_dates"
-                    className="text-sm font-bold"
-                  >
-                    面談候補日
-                  </label>
-                  <textarea
-                    id="interview_dates"
-                    name="interview_dates"
-                    rows={4}
-                    placeholder={`例：○○月○○日（曜日）10:00〜12:00`}
-                    value={interview_dates}
-                    onChange={(e) => setInterviewDates(e.target.value)}
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
+            {/* 書類通過 or お見送り */}
+            {selection_fields}
+            
 
-                <div className="space-y-2">
-                  <label htmlFor="passed_note" className="text-sm font-bold">
-                    補足メッセージ
-                  </label>
-                  <textarea
-                    id="passed_note"
-                    name="passed_note"
-                    rows={4}
-                    placeholder="面談形式、所要時間、事前準備などがあればご記入ください。"
-                    value={passed_note}
-                    onChange={(e) => setPassedNote(e.target.value)}
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-              </div>
+            {/* エラーメッセージ */}
+            {error_message && (
+              <p role="alert" className="text-sm font-bold text-red-400">
+                {error_message}
+              </p>
             )}
 
-            {/* お見送り：理由 + 課題点 */}
-            {selection_result === "rejected" && (
-              <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="rejection_reason"
-                    className="text-sm font-bold"
-                  >
-                    お見送り理由
-                    <span className="ml-2 text-xs text-red-400">必須</span>
-                  </label>
-                  <textarea
-                    id="rejection_reason"
-                    name="rejection_reason"
-                    rows={5}
-                    placeholder="お見送りの理由をご記入ください。"
-                    value={rejection_reason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="improvement_points"
-                    className="text-sm font-bold"
-                  >
-                    課題点・改善するとよい点
-                  </label>
-                  <textarea
-                    id="improvement_points"
-                    name="improvement_points"
-                    rows={5}
-                    placeholder="今後改善するとよい点、足りなかった経験・スキルなどがあればご記入ください。"
-                    value={improvement_points}
-                    onChange={(e) => setImprovementPoints(e.target.value)}
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* 仮ボタン */}
+            {/* 文面生成ボタン */}
             <div className="pt-2">
               <button
                 type="button"
@@ -232,23 +245,64 @@ export default function ReplyPage() {
               <p>入力内容をもとに、ここへ連絡文面を表示します。</p>
             )}
           </div>
+
+          {/* コピーボタン */}
+          {preview_message && (
+            <div className="mt-4 space-y-3">
+              <button
+                type="button"
+                onClick={handleCopyMessage}
+                className="rounded-[var(--radius-m)] border border-[var(--color-border)] px-4 py-2 text-sm font-bold text-[var(--color-text)] transition hover:bg-[var(--color-surface)] active:scale-[0.98]"
+              >
+                文面をコピーする
+              </button>
+
+              {copy_message && (
+                <p className="text-sm text-[var(--color-accent)]">
+                  {copy_message}
+                </p>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </main>
   );
 
   function handleGenerateMessage() {
+    setCopyMessage("");
+    setErrorMessage("");
+    setPreviewMessage("");
+
+    if (!selection_result) {
+      setErrorMessage("選考結果を選択してください。");
+      return;
+    }
+
+    if (selection_result === "passed" && !interview_dates.trim()) {
+      setErrorMessage("書類通過の場合は、面談候補日を入力してください。");
+      return;
+    }
+
+    if (selection_result === "rejected" && !rejection_reason.trim()) {
+      setErrorMessage("お見送りの場合は、お見送り理由を入力してください。");
+      return;
+    }
+
     if (selection_result === "passed") {
-      const message = `${company}
-    ${person} 様
+      const message = `Leon.C 様
 
-    書類選考通過のご連絡ありがとうございます。
-    面談候補日について、以下の内容で確認いたしました。
+    ${company}
+    ${person} です。
 
+    書類選考の結果、ぜひ一度面談の機会を設けたくご連絡いたしました。
+
+    【面談候補日】
     ${interview_dates}
 
     ${passed_note}
 
+    ご都合のよい日程がございましたら、ご返信いただけますと幸いです。
     何卒よろしくお願いいたします。`;
 
       setPreviewMessage(message);
@@ -256,25 +310,36 @@ export default function ReplyPage() {
     }
 
     if (selection_result === "rejected") {
-      const message = `${company}
-      ${person} 様
+      const message = `Leon.C 様
 
-      選考結果のご連絡ありがとうございます。
-      お見送り理由について、以下の内容で確認いたしました。
+      ${company}
+      ${person} です。
+
+      このたびはご応募いただき、誠にありがとうございました。
+      選考の結果、今回はお見送りとさせていただくこととなりました。
 
       【お見送り理由】
       ${rejection_reason}
 
-      【課題点・改善点】
+      【課題点・改善するとよい点】
       ${improvement_points}
 
-      今後の改善に活かしてまいります。
-      ご連絡いただきありがとうございました。`;
+      貴重なお時間をいただき、ありがとうございました。
+      今後のご活躍をお祈り申し上げます。`;
 
       setPreviewMessage(message);
       return;
     }
+  }
 
-    setPreviewMessage("選考結果を選択してください。");
+  async function handleCopyMessage() {
+    if (!preview_message) {
+      setCopyMessage("コピーする文面がありません。");
+      return;
+    }
+
+    await navigator.clipboard.writeText(preview_message);
+
+    setCopyMessage("文面をコピーしました。");
   }
 }
