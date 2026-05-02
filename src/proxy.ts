@@ -1,4 +1,4 @@
-// middleware.ts 未ログインなら /login に飛ばす門番
+// proxy.ts 未ログインなら /login に飛ばす門番
 // Cookie があるか見る ⇒ なければ /login へ飛ばす ⇒ あれば通す
 
 import { NextRequest, NextResponse } from "next/server";

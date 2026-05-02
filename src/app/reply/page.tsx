@@ -3,7 +3,7 @@
 // src/app/reply/page.tsx
 
 import { useState } from "react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type SelectionResult = "passed" | "rejected" | "";
 
@@ -133,10 +133,7 @@ export default function ReplyPage() {
                 type="text"
                 placeholder="例：株式会社〇〇"
                 value={company}
-                onChange={(e) => {
-                  console.log("入力された会社名:", e.target.value);
-                  setCompany(e.target.value);
-                }}
+                onChange={(e) => setCompany(e.target.value)}
                 className="w-full rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
               />
             </div>
@@ -290,42 +287,42 @@ export default function ReplyPage() {
     }
 
     if (selection_result === "passed") {
-      const message = `Leon.C 様
+const message = `Leon.C 様
 
-    ${company}
-    ${person} です。
+${company}
+${person} です。
 
-    書類選考の結果、ぜひ一度面談の機会を設けたくご連絡いたしました。
+書類選考の結果、ぜひ一度面談の機会を設けたくご連絡いたしました。
 
-    【面談候補日】
-    ${interview_dates}
+【面談候補日】
+${interview_dates}
 
-    ${passed_note}
+${passed_note}
 
-    ご都合のよい日程がございましたら、ご返信いただけますと幸いです。
-    何卒よろしくお願いいたします。`;
+ご都合のよい日程がございましたら、ご返信いただけますと幸いです。
+何卒よろしくお願いいたします。`;
 
       setPreviewMessage(message);
       return;
     }
 
     if (selection_result === "rejected") {
-      const message = `Leon.C 様
+const message = `Leon.C 様
 
-      ${company}
-      ${person} です。
+${company}
+${person} です。
 
-      このたびはご応募いただき、誠にありがとうございました。
-      選考の結果、今回はお見送りとさせていただくこととなりました。
+このたびはご応募いただき、誠にありがとうございました。
+選考の結果、今回はお見送りとさせていただくこととなりました。
 
-      【お見送り理由】
-      ${rejection_reason}
+【お見送り理由】
+${rejection_reason}
 
-      【課題点・改善するとよい点】
-      ${improvement_points}
+【課題点・改善するとよい点】
+${improvement_points}
 
-      貴重なお時間をいただき、ありがとうございました。
-      今後のご活躍をお祈り申し上げます。`;
+貴重なお時間をいただき、ありがとうございました。
+今後のご活躍をお祈り申し上げます。`;
 
       setPreviewMessage(message);
       return;
