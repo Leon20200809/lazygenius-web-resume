@@ -1,210 +1,240 @@
-// app/resume/page.tsx
-// 役割:
-// - Web版履歴書
-// - Web版職務経歴書
-// - 採用担当向け閲覧ページ
+// src/app/resume/page.tsx
+// WEB版プロフィール
+import { buildResumeData } from "@/lib/build-resume-data";
 
-"use client";
-
-// src/app/reply/page.tsx
-
-import { useState } from "react";
-
-type SelectionResult = "passed" | "rejected" | "";
-
-export default function ReplyPage() {
-  const [selection_result, setSelectionResult] =
-    useState<SelectionResult>("");
+export default async function ResumePage() {
+  const resume = await buildResumeData();
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)] px-6 py-12 text-[var(--color-text)]">
-      <div className="mx-auto max-w-3xl space-y-8">
+      <div className="mx-auto max-w-5xl space-y-12">
         {/* ヘッダー */}
-        <header className="space-y-3">
+        <header className="space-y-4">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
-            Selection Reply
+            Web Profile
           </p>
 
-          <h1 className="text-3xl font-bold md:text-4xl">
-            選考結果連絡フォーム
-          </h1>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold md:text-5xl">
+              {resume.profile.name}
+            </h1>
 
-          <p className="max-w-2xl text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
-            書類選考の結果、面談日程のご相談、お見送りのご連絡を簡単に作成できます。
-            入力内容をもとに、Leon.C 宛の連絡文面を生成します。
-          </p>
+            {resume.profile.furigana && (
+              <p className="text-sm text-[var(--color-muted)]">
+                {resume.profile.furigana}
+              </p>
+            )}
+
+            <p className="text-lg font-semibold text-[var(--color-accent)]">
+              {resume.profile.title}
+            </p>
+
+            <p className="max-w-3xl text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
+              {resume.profile.tagline}
+            </p>
+          </div>
         </header>
 
-        {/* フォームカード */}
+        {/* 基本情報 */}
         <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
-          <form className="space-y-6">
-            {/* 会社名 */}
-            <div className="space-y-2">
-              <label htmlFor="company" className="text-sm font-bold">
-                会社名
-              </label>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                placeholder="例：株式会社〇〇"
-                className="w-full rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-              />
+          <h2 className="mb-4 text-xl font-bold">基本情報</h2>
+
+          <dl className="grid gap-4 text-sm md:grid-cols-2">
+            <div>
+              <dt className="text-[var(--color-muted)]">希望職種</dt>
+              <dd className="font-semibold">{resume.profile.wanted_job}</dd>
             </div>
 
-            {/* 担当者名 */}
-            <div className="space-y-2">
-              <label htmlFor="person" className="text-sm font-bold">
-                ご担当者名
-              </label>
-              <input
-                id="person"
-                name="person"
-                type="text"
-                placeholder="例：山田 太郎"
-                className="w-full rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-              />
+            <div>
+              <dt className="text-[var(--color-muted)]">最寄駅</dt>
+              <dd className="font-semibold">
+                {resume.profile.nearest_station}
+              </dd>
             </div>
 
-            {/* 返信用メールアドレス */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-bold">
-                返信用メールアドレス
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="例：recruit@example.com"
-                className="w-full rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-              />
+            <div>
+              <dt className="text-[var(--color-muted)]">通勤時間</dt>
+              <dd className="font-semibold">
+                {resume.profile.commuting_time}
+              </dd>
             </div>
 
-            {/* 選考結果 */}
-            <fieldset className="space-y-3">
-              <legend className="text-sm font-bold">選考結果</legend>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <label className="flex cursor-pointer items-center gap-3 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 transition hover:border-[var(--color-accent)]">
-                  <input
-                    type="radio"
-                    name="selection_result"
-                    value="passed"
-                    checked={selection_result === "passed"}
-                    onChange={() => setSelectionResult("passed")}
-                  />
-                  <span>書類通過・面談日程調整</span>
-                </label>
-
-                <label className="flex cursor-pointer items-center gap-3 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 transition hover:border-[var(--color-accent)]">
-                  <input
-                    type="radio"
-                    name="selection_result"
-                    value="rejected"
-                    checked={selection_result === "rejected"}
-                    onChange={() => setSelectionResult("rejected")}
-                  />
-                  <span>お見送り</span>
-                </label>
-              </div>
-
-              {!selection_result && (
-                <p className="text-xs text-[var(--color-muted)]">
-                  選考結果を選択すると、必要な入力欄が表示されます。
-                </p>
-              )}
-            </fieldset>
-
-            {/* 書類通過：面談候補日 + 補足 */}
-            {selection_result === "passed" && (
-              <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="interview_dates"
-                    className="text-sm font-bold"
-                  >
-                    面談候補日
-                  </label>
-                  <textarea
-                    id="interview_dates"
-                    name="interview_dates"
-                    rows={4}
-                    placeholder={`例：5月10日（金）10:00〜12:00 5月13日（月）14:00〜16:00`}
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="passed_note" className="text-sm font-bold">
-                    補足メッセージ
-                  </label>
-                  <textarea
-                    id="passed_note"
-                    name="passed_note"
-                    rows={4}
-                    placeholder="面談形式、所要時間、事前準備などがあればご記入ください。"
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* お見送り：理由 + 課題点 */}
-            {selection_result === "rejected" && (
-              <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="rejection_reason"
-                    className="text-sm font-bold"
-                  >
-                    お見送り理由
-                    <span className="ml-2 text-xs text-red-400">必須</span>
-                  </label>
-                  <textarea
-                    id="rejection_reason"
-                    name="rejection_reason"
-                    rows={5}
-                    placeholder="お見送りの理由をご記入ください。"
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="improvement_points"
-                    className="text-sm font-bold"
-                  >
-                    課題点・改善するとよい点
-                  </label>
-                  <textarea
-                    id="improvement_points"
-                    name="improvement_points"
-                    rows={5}
-                    placeholder="今後改善するとよい点、足りなかった経験・スキルなどがあればご記入ください。"
-                    className="w-full resize-y rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-text)] outline-none transition focus:border-[var(--color-accent)]"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* 仮ボタン */}
-            <div className="pt-2">
-              <button
-                type="button"
-                className="w-full rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)] hover:brightness-110 active:scale-[0.98]"
-              >
-                文面を生成する
-              </button>
+            <div>
+              <dt className="text-[var(--color-muted)]">メール</dt>
+              <dd className="font-semibold">{resume.profile.email}</dd>
             </div>
-          </form>
+
+            <div>
+              <dt className="text-[var(--color-muted)]">GitHub</dt>
+              <dd>
+                <a
+                  href={resume.profile.github_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--color-accent)] hover:underline"
+                >
+                  {resume.profile.github_url}
+                </a>
+              </dd>
+            </div>
+
+            <div>
+              <dt className="text-[var(--color-muted)]">ポートフォリオ</dt>
+              <dd>
+                <a
+                  href={resume.profile.portfolio_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[var(--color-accent)] hover:underline"
+                >
+                  {resume.profile.portfolio_url}
+                </a>
+              </dd>
+            </div>
+          </dl>
         </section>
 
-        {/* プレビュー枠 */}
+        {/* 自己紹介 */}
         <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
-          <h2 className="mb-4 text-xl font-bold">生成文面プレビュー</h2>
+          <h2 className="mb-4 text-xl font-bold">自己紹介</h2>
 
-          <div className="rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4 text-sm leading-relaxed text-[var(--color-muted)]">
-            入力内容をもとに、ここへ連絡文面を表示します。
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
+            {resume.profile.summary}
+          </p>
+        </section>
+
+        {/* 評価ポイント */}
+        <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
+          <h2 className="mb-4 text-xl font-bold">評価ポイント</h2>
+
+          <ul className="space-y-2 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
+            <li>・小規模Webアプリの設計〜実装が可能</li>
+            <li>・認証 / フォーム / API連携 / 印刷対応</li>
+            <li>・Google Sheetsを用いたデータ管理</li>
+            <li>・Next.js / TypeScript を用いたWeb履歴書の構築</li>
+          </ul>
+
+          <p className="mt-4 text-xs text-[var(--color-muted)]">
+            Next.js（App Router）/ TypeScript / Google Sheets（CSV）/ Vercel
+          </p>
+        </section>
+
+        {/* 学歴 */}
+        <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
+          <h2 className="mb-4 text-xl font-bold">学歴</h2>
+
+          <div className="space-y-4">
+            {resume.education.map((education) => (
+              <article
+                key={education.id}
+                className="border-b border-[var(--color-border)] pb-4 last:border-b-0 last:pb-0"
+              >
+                <p className="text-sm text-[var(--color-muted)]">
+                  {education.period_start} 〜 {education.period_end}
+                </p>
+
+                <h3 className="mt-1 font-bold">{education.school_name}</h3>
+
+                <p className="text-sm text-[var(--color-muted)]">
+                  {education.faculty}
+                  {education.department && ` / ${education.department}`}
+                </p>
+
+                {education.summary && (
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted)]">
+                    {education.summary}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* 職歴 */}
+        <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
+          <h2 className="mb-4 text-xl font-bold">職歴</h2>
+
+          <div className="space-y-6">
+            {resume.career.map((career) => (
+              <article
+                key={career.id}
+                className="border-b border-[var(--color-border)] pb-6 last:border-b-0 last:pb-0"
+              >
+                <p className="text-sm text-[var(--color-muted)]">
+                  {career.period_start} 〜 {career.period_end}
+                </p>
+
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 className="text-lg font-bold">{career.company}</h3>
+                  <p className="text-sm text-[var(--color-muted)]">
+                    {career.employment_type}
+                  </p>
+                </div>
+
+                <p className="mt-1 font-semibold text-[var(--color-accent)]">
+                  {career.role}
+                </p>
+
+                <dl className="mt-3 grid gap-3 text-sm md:grid-cols-2">
+                  <div>
+                    <dt className="text-[var(--color-muted)]">業界</dt>
+                    <dd>{career.industry}</dd>
+                  </div>
+
+                  <div>
+                    <dt className="text-[var(--color-muted)]">チーム規模</dt>
+                    <dd>{career.team_size}</dd>
+                  </div>
+                </dl>
+
+                {career.summary && (
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-muted)]">
+                    {career.summary}
+                  </p>
+                )}
+
+                {career.achievements && (
+                  <div className="mt-3">
+                    <h4 className="text-sm font-bold">実績</h4>
+                    <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-muted)]">
+                      {career.achievements}
+                    </p>
+                  </div>
+                )}
+
+                {career.tech_stack && (
+                  <p className="mt-3 text-xs text-[var(--color-muted)]">
+                    技術：{career.tech_stack}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* 資格 */}
+        <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
+          <h2 className="mb-4 text-xl font-bold">資格</h2>
+
+          <div className="space-y-3">
+            {resume.certification.map((certification) => (
+              <article
+                key={`${certification.name}-${certification.acquired_date}`}
+                className="border-b border-[var(--color-border)] pb-3 last:border-b-0 last:pb-0"
+              >
+                <p className="text-sm text-[var(--color-muted)]">
+                  {certification.acquired_date}
+                </p>
+
+                <h3 className="font-bold">{certification.name}</h3>
+
+                {certification.note && (
+                  <p className="mt-1 text-sm text-[var(--color-muted)]">
+                    {certification.note}
+                  </p>
+                )}
+              </article>
+            ))}
           </div>
         </section>
       </div>
