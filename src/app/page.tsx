@@ -4,7 +4,7 @@
 // - 職務経歴書PDF導線
 // - Web版プロフィール導線
 
-const CAREER_SHEET_PDF_PATH = "/docs/career-sheet.pdf";
+const CAREER_SHEET_PDF_PATH = "https://drive.google.com/file/d/1GqRGLEOU4UuYh7zE3WV5qh6HinyYPDBb/view?usp=sharing";
 
 export default async function Home() {
   return (
