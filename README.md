@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LazyGenius Web Resume
 
-## Getting Started
+Web開発エンジニアとしてのスキル証明と、応募書類の運用効率化を目的としたWeb履歴書アプリです。
 
-First, run the development server:
+従来のPDFベースの履歴書・職務経歴書ではなく、URLで共有できるWebページとして構築し、必要に応じてA4印刷・PDF出力できる構成にしています。
 
-```bash
+本アプリは単なるポートフォリオではなく、応募活動そのものを改善するためのツールとして設計しています。
+
+---
+
+## 目的
+
+このアプリは、以下を目的として開発しています。
+
+- Web開発エンジニアとしてのスキルを証明する
+- 採用担当者・現場担当者が確認しやすい形で情報を整理する
+- 応募書類の更新・共有・印刷を効率化する
+- Google Sheetsでデータを管理し、コードと文章データを分離する
+
+---
+
+## 使用技術
+
+- Next.js
+- TypeScript
+- React
+- Tailwind CSS
+- Google Sheets
+- CSV
+
+---
+
+## 技術選定の理由
+
+### Next.js
+
+本アプリは「表示速度」「構造の明確さ」「運用のしやすさ」を重視し、Next.jsを採用しました。
+
+- サーバーコンポーネントを前提とした構成により、データ取得と描画の責務を分離しやすい
+- ページ単位で構造を整理できるため、履歴書のような情報表示アプリと相性が良い
+- ビルドおよびデプロイが容易で、改修・公開のサイクルを高速化できる
+
+---
+
+### TypeScript
+
+CSVから取得したデータを安全に扱うため、TypeScriptを採用しました。
+
+- データ構造を型として定義できる
+- CSVの列構成とアプリ側のデータ構造を対応させやすい
+- 変更時のミスを早期に検知しやすい
+
+---
+
+### Google Sheets + CSV
+
+データ管理にはGoogle Sheetsを採用し、CSV形式で取得しています。
+
+目的は「更新のしやすさ」と「運用コストの削減」です。
+
+- Google Sheetsを使うことで、エンジニアでなくても内容を編集できる
+- CSVとして取得することで、APIや認証処理を必要とせず、シンプルな構成を維持できる
+- データをコードから分離することで、デプロイなしで内容更新が可能になる
+
+この構成により、開発者だけに依存しない運用を目指しています。
+
+---
+
+## データフロー
+
+```txt
+Google Sheets（データ管理）
+↓
+CSVエクスポート
+↓
+fetch系関数（データ取得）
+↓
+parse系関数（構造変換）
+↓
+TypeScript型（データ構造の保証）
+↓
+Next.js Server Component（データ注入）
+↓
+UIコンポーネント（表示）
+
+データ取得・変換・表示を分離することで、責務ごとの変更影響を限定しています。
+
+責務分離
+
+本アプリでは、各処理の責務を明確に分離しています。
+
+fetch系：外部データ（Google Sheets）からCSVを取得
+parse系：CSVテキストをアプリ用データ構造に変換
+types：データ構造を型として定義し、整合性を保証
+app（ページ）：データ取得と画面構成を管理
+components：UIの表示に専念
+
+この構成により、変更時の影響範囲を最小限に抑えています。
+
+工夫したポイント
+Google Sheetsをデータ管理画面として活用
+CSV取得処理とパース処理を分離
+TypeScriptで履歴書データの構造を明確化
+Web表示用ページと印刷用ページを分離
+A4印刷・PDF出力を前提にした画面設計
+応募活動で使いやすいURL共有型の構成
+採用担当のレスポンス負荷を下げる連絡フォームの設置
+環境変数による設定分離（開発 / 本番）
+スプレッドシートIDの秘匿化（GitHub非公開）
+環境変数の設計
+
+Google SheetsのIDやGIDは環境変数で管理しています。
+
+.env.local に実値を保持
+.env.example にはキーのみ定義
+命名規則を統一し、コードとの不整合を防止
+
+環境変数の命名不一致による取得失敗を経験したため、
+「環境とコードの契約」を明確にする設計を意識しています。
+
+今後の改善予定
+ログインページのUI改善
+READMEと開発ログの整備
+印刷レイアウトの調整
+職務経歴データの文章改善
+データ構造のさらなる型定義整理
+必要に応じてDB化・API化を検討
+Development
+インストール
+npm install
+開発サーバー起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+ブラウザで以下にアクセスします。
+
+http://localhost:3000
+ビルド
+npm run build
+本番起動
+npm run start
+Environment Variables
+
+環境変数は .env.local に設定します。
+
+cp .env.example .env.local
+
+必要な値を設定してから開発サーバーを起動してください。
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

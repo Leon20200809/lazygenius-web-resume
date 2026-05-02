@@ -1,15 +1,16 @@
 // fetch-sheet-csv.ts → 指定したシートのCSVを取るだけ
-const SPREADSHEET_ID = "1hZGl7nRKstVKCmEJQh3EJf-_D24BJQSNiO_DdGktoz0";
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_BASE_ID;
 
 const SHEETS = {
-  profile: "1849835023",
-  education: "1886713664",
-  career: "255949518",
-  certification: "1879285802",
+  profile: process.env.GOOGLE_SHEET_PROFILE_GID,
+  education: process.env.GOOGLE_SHEET_EDUCATION_GID,
+  career: process.env.GOOGLE_SHEET_CAREER_GID,
+  certification: process.env.GOOGLE_SHEET_CERTIFICATION_GID
 } as const;
 
-export async function fetchSheetCsv(sheetName: keyof typeof SHEETS): Promise<string> {
-
+export async function fetchSheetCsv(
+  sheetName: keyof typeof SHEETS
+): Promise<string> {
   const gid = SHEETS[sheetName];
   const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}`;
 
