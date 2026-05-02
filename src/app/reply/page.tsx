@@ -210,6 +210,7 @@ export default function ReplyPage() {
             <div className="pt-2">
               <button
                 type="button"
+                onClick={handleGenerateMessage}
                 className="w-full rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)] hover:brightness-110 active:scale-[0.98]"
               >
                 文面を生成する
@@ -223,27 +224,57 @@ export default function ReplyPage() {
           <h2 className="mb-4 text-xl font-bold">生成文面プレビュー</h2>
 
           <div className="rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4 text-sm leading-relaxed text-[var(--color-muted)]">
-            入力内容をもとに、ここへ連絡文面を表示します。
-            <p className="text-sm text-red-400">現在の会社名：{company}</p>
-            <pre className="mt-4 overflow-auto rounded bg-black/40 p-4 text-xs text-red-300">
-              {JSON.stringify(
-                {
-                  company,
-                  person,
-                  email,
-                  selection_result,
-                  interview_dates,
-                  passed_note,
-                  rejection_reason,
-                  improvement_points,
-                },
-                null,
-                2,
-              )}
-            </pre>
+            {preview_message ? (
+              <pre className="whitespace-pre-wrap font-sans text-[var(--color-text)]">
+                {preview_message}
+              </pre>
+            ) : (
+              <p>入力内容をもとに、ここへ連絡文面を表示します。</p>
+            )}
           </div>
         </section>
       </div>
     </main>
   );
+
+  function handleGenerateMessage() {
+    if (selection_result === "passed") {
+      const message = `${company}
+    ${person} 様
+
+    書類選考通過のご連絡ありがとうございます。
+    面談候補日について、以下の内容で確認いたしました。
+
+    ${interview_dates}
+
+    ${passed_note}
+
+    何卒よろしくお願いいたします。`;
+
+      setPreviewMessage(message);
+      return;
+    }
+
+    if (selection_result === "rejected") {
+      const message = `${company}
+      ${person} 様
+
+      選考結果のご連絡ありがとうございます。
+      お見送り理由について、以下の内容で確認いたしました。
+
+      【お見送り理由】
+      ${rejection_reason}
+
+      【課題点・改善点】
+      ${improvement_points}
+
+      今後の改善に活かしてまいります。
+      ご連絡いただきありがとうございました。`;
+
+      setPreviewMessage(message);
+      return;
+    }
+
+    setPreviewMessage("選考結果を選択してください。");
+  }
 }
