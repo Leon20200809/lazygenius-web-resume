@@ -1,7 +1,6 @@
 // middleware.ts 未ログインなら /login に飛ばす門番
 // Cookie があるか見る ⇒ なければ /login へ飛ばす ⇒ あれば通す
 
-
 import { NextRequest, NextResponse } from "next/server";
 // NextRequest: ブラウザから届いた「リクエスト（お願い）」の中身をラップしたオブジェクト
 // request.nextUrl: アクセスしようとしているURL（パス名など）を簡単に取得
