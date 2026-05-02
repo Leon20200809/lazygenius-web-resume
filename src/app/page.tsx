@@ -4,6 +4,8 @@
 // - 職務経歴書PDF導線
 // - Web版プロフィール導線
 
+const CAREER_SHEET_PDF_PATH = "/docs/career-sheet.pdf";
+
 export default async function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
@@ -23,44 +25,56 @@ export default async function Home() {
           ご覧いただきありがとうございます。
         </p>
 
-        {/* <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
-          フルスタック志向エンジニア
-        </p> */}
+        <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
+          小規模Webアプリを1人で設計・実装・運用可能
+        </p>
 
         <p className="mb-10 max-w-2xl text-[length:var(--fs-base)] leading-relaxed text-[var(--color-muted)]">
           PHP / WordPress / Laravel / Next.js を軸に、
-          実務で使える仕組みを設計・実装しています。
+          <br />
+          認証・フォーム・API連携・印刷対応まで含めて構築できます。
         </p>
 
         {/* 導線 */}
         <div className="grid w-full gap-4">
           <a
-            href="/print/resume"
-            target="_blank"
+            href="/resume"
             className="rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)] hover:brightness-110 active:scale-[0.98]"
           >
-            履歴書をダウンロード
+            Web版プロフィールを見る
           </a>
 
           <a
-            href="/print/career"
+            href="/print/resume"
             target="_blank"
+            rel="noopener noreferrer"
             className="rounded-[var(--radius-l)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)] active:scale-[0.98]"
           >
-            職務経歴書をダウンロード
+            履歴書PDFを開く
           </a>
 
           <a
-            href="/resume"
+            href={CAREER_SHEET_PDF_PATH}
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-[var(--radius-l)] border border-[var(--color-border)] px-6 py-4 font-bold text-[var(--color-text)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-surface)] active:scale-[0.98]"
           >
-            Web版を見る
+            職務経歴書PDFを開く
           </a>
         </div>
 
         {/* 技術スタック */}
         <p className="mt-10 text-sm text-[var(--color-muted)]">
-          PHP / WordPress / Laravel / Next.js / TypeScript
+          使用技術：Next.js / TypeScript / Google Sheets CSV / PHP / WordPress / Laravel
+        </p>
+
+        {/* このサイトでわかること */}
+        <p className="mt-10 text-sm text-left text-[var(--color-muted)]">
+          ■このサイトでわかること
+          ・Google Sheetsをデータ管理元にしたWeb履歴書<br />
+          ・Next.js / TypeScriptによる画面構築 <br />
+          ・履歴書 / 職務経歴書のA4印刷対応<br />
+          ・小規模アプリを1人で設計・実装できること
         </p>
 
         {/* 外部導線 */}
@@ -68,7 +82,7 @@ export default async function Home() {
           <a
             href="https://lazygenius.dev"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 transition hover:text-[var(--color-accent-hover)]"
           >
             設計思想・制作実績を見る（個人サイト）を見る

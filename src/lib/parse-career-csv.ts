@@ -1,6 +1,6 @@
 // parse-career-csv.ts
 import { parseCsvTextToRows } from "@/lib/parse-csv-text-to-rows";
-import { Career } from "@/types/career";
+import type { Career } from "@/types/career";
 
 export function parseCareerCsv(csv_text: string): Career[] {
   const rows = parseCsvTextToRows(csv_text);
