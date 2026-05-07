@@ -5,7 +5,10 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 
-type SelectionResult = "passed" | "rejected" | "";
+import { buildReplyMessage } from "@/features/reply/build-reply-message";
+import type { ReplyFormValues, SelectionResult } from "@/features/reply/types";
+
+import { ReplyForm } from "@/features/reply/components/reply-form";
 
 export default function ReplyPage() {
   const [selection_result, setSelectionResult] = useState<SelectionResult>("");
@@ -25,7 +28,9 @@ export default function ReplyPage() {
 
   let selection_fields: ReactNode = null;
 
-  {/* 書類通過：面談候補日 + 補足 */}
+  {
+    /* 書類通過：面談候補日 + 補足 */
+  }
   if (selection_result === "passed") {
     selection_fields = (
       <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
@@ -62,7 +67,9 @@ export default function ReplyPage() {
     );
   }
 
-  {/* お見送り：理由 + 課題点 */}
+  {
+    /* お見送り：理由 + 課題点 */
+  }
   if (selection_result === "rejected") {
     selection_fields = (
       <div className="space-y-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4">
@@ -120,6 +127,8 @@ export default function ReplyPage() {
         </header>
 
         {/* フォームカード */}
+        <ReplyForm recipientName="Leon.C"/>
+
         <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
           <form className="space-y-6">
             {/* 会社名 */}
@@ -207,7 +216,6 @@ export default function ReplyPage() {
 
             {/* 書類通過 or お見送り */}
             {selection_fields}
-            
 
             {/* エラーメッセージ */}
             {error_message && (
@@ -286,49 +294,24 @@ export default function ReplyPage() {
       return;
     }
 
-    if (selection_result === "passed") {
-const message = `Leon.C 様
+    const values: ReplyFormValues = {
+      recipient_name: "profile.name",
+      selection_result,
+      company,
+      person,
+      email,
+      interview_dates,
+      passed_note,
+      rejection_reason,
+      improvement_points,
+    };
 
-${company}
-${person} です。
+    const message = buildReplyMessage(values);
 
-書類選考の結果、ぜひ一度面談の機会を設けたくご連絡いたしました。
-
-【面談候補日】
-${interview_dates}
-
-${passed_note}
-
-ご都合のよい日程がございましたら、ご返信いただけますと幸いです。
-何卒よろしくお願いいたします。`;
-
-      setPreviewMessage(message);
-      return;
-    }
-
-    if (selection_result === "rejected") {
-const message = `Leon.C 様
-
-${company}
-${person} です。
-
-このたびはご応募いただき、誠にありがとうございました。
-選考の結果、今回はお見送りとさせていただくこととなりました。
-
-【お見送り理由】
-${rejection_reason}
-
-【課題点・改善するとよい点】
-${improvement_points}
-
-貴重なお時間をいただき、ありがとうございました。
-今後のご活躍をお祈り申し上げます。`;
-
-      setPreviewMessage(message);
-      return;
-    }
+    setPreviewMessage(message);
   }
 
+  // 文面コピーボタン
   async function handleCopyMessage() {
     if (!preview_message) {
       setCopyMessage("コピーする文面がありません。");
