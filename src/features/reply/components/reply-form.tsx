@@ -10,9 +10,10 @@ import type { ReplyFormValues, SelectionResult } from "@/features/reply/types";
 
 type ReplyFormProps = {
   recipientName: string;
+  recipientEmail: string;
 };
 
-export function ReplyForm({ recipientName }: ReplyFormProps) {
+export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
   // 1. state
   const [selection_result, setSelectionResult] = useState<SelectionResult>("");
 
@@ -33,6 +34,12 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
   let selection_fields: ReactNode = null;
 
   // 3. 処理関数
+  /**
+   * 入力内容をもとに、Leon.C 宛の返信文面を生成する。
+   *
+   * 必須項目が不足している場合は文面を生成せず、
+   * エラーメッセージを表示する。
+   */
   function handleGenerateMessage() {
     setCopyMessage("");
     setErrorMessage("");
@@ -70,7 +77,10 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
     setPreviewMessage(message);
   }
 
-  // 文面コピーボタン処理
+  /**
+   * 文面コピーボタン処理
+   * @returns
+   */
   async function handleCopyMessage() {
     if (!preview_message) {
       setCopyMessage("コピーする文面がありません。");
@@ -81,6 +91,32 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
 
     setCopyMessage("文面をコピーしました。");
   }
+
+  /**
+   * 生成済みの文面を使って、ユーザーのメールソフトを起動する。
+   *
+   * preview_message が空の場合はメールソフトを起動せず、
+   * エラーメッセージを表示する。
+   */
+  const handleOpenMailClient = () => {
+    if (!preview_message) {
+      setErrorMessage("先に文面を生成してください。");
+      return;
+    }
+
+    const subject = "選考結果のご連絡";
+    const body = preview_message;
+
+    const mailto_url = `mailto:${recipientEmail}?subject=${encodeURIComponent(
+      subject,
+    )}&body=${encodeURIComponent(body)}`;
+
+    console.log("件名:", subject);
+    console.log("本文:", body);
+    console.log("mailto:", mailto_url);
+
+    window.location.href = mailto_url;
+  };
 
   // 4. 条件分岐でJSXを作る
   // 書類通過：面談候補日 + 補足
@@ -161,9 +197,6 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
   // 5. 最後に画面へ表示するJSXを返す
   return (
     <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
-      <p>ReplyForm 呼び出し成功</p>
-      <p>宛名：{recipientName}</p>
-
       <div className="mt-6 space-y-6">
         <div className="space-y-2">
           <label htmlFor="company" className="text-sm font-bold">
@@ -210,8 +243,8 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
 
       <div className="mt-6 space-y-3">
         <p className="text-sm font-bold">選考結果</p>
-
         <div className="grid gap-3 md:grid-cols-2">
+          {/* ラジオボタン 書類通過・面談日調整 */}
           <label className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 transition hover:border-[var(--color-accent)] focus-within:border-[var(--color-accent)]">
             <input
               type="radio"
@@ -224,6 +257,7 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
             <span className="cursor-pointer">書類通過・面談日調整</span>
           </label>
 
+          {/* ラジオボタン お見送り */}
           <label className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-3 transition hover:border-[var(--color-accent)] focus-within:border-[var(--color-accent)]">
             <input
               type="radio"
@@ -248,11 +282,32 @@ export function ReplyForm({ recipientName }: ReplyFormProps) {
         >
           文面を生成する
         </button>
-        
+
         {error_message && (
           <p className="text-sm font-bold text-red-400">{error_message}</p>
         )}
       </div>
+
+      {/* 生成文面表示 */}
+      {preview_message && (
+        <div className="mt-6 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+          <p className="mb-2 text-sm font-bold text-[var(--color-muted)]">
+            生成された文面
+          </p>
+
+          <pre className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-text)]">
+            {preview_message}
+          </pre>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={handleOpenMailClient}
+        className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      >
+        メールソフトで送る
+      </button>
     </section>
   );
 }
