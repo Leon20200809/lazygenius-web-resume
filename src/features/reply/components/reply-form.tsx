@@ -118,6 +118,26 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
     window.location.href = mailto_url;
   };
 
+  /**
+   * fetchでAPIエンドポイントへPOST送信 /api/reply
+   */
+  const handleApiSend = async () => {
+    const reply_api_endpoint = "/api/reply";
+
+    const response = await fetch(reply_api_endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recruiter_message: preview_message,
+      }),
+    });
+    const result = await response.json();
+
+    console.log(result);
+  };
+
   // 4. 条件分岐でJSXを作る
   // 書類通過：面談候補日 + 補足
   if (selection_result === "passed") {
@@ -298,16 +318,24 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
           <pre className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-text)]">
             {preview_message}
           </pre>
+
+          <button
+            type="button"
+            onClick={handleOpenMailClient}
+            className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          >
+            メールソフトで送る
+          </button>
+
+          <button
+            type="button"
+            onClick={handleApiSend}
+            className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          >
+            APIにデータを送る
+          </button>
         </div>
       )}
-
-      <button
-        type="button"
-        onClick={handleOpenMailClient}
-        className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-      >
-        メールソフトで送る
-      </button>
     </section>
   );
 }
