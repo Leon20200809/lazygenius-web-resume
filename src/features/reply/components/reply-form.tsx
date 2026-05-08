@@ -134,8 +134,6 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
       }),
     });
     const result = await response.json();
-
-    console.log(result);
   };
 
   // 4. 条件分岐でJSXを作る
@@ -321,19 +319,20 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
 
           <button
             type="button"
-            onClick={handleOpenMailClient}
-            className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-          >
-            メールソフトで送る
-          </button>
-
-          <button
-            type="button"
             onClick={handleApiSend}
             className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           >
             APIにデータを送る
           </button>
+
+          <button
+            type="button"
+            onClick={handleOpenMailClient}
+            className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+          >
+            メールソフトで送る
+          </button>
+          
         </div>
       )}
     </section>
