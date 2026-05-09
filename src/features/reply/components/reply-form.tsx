@@ -54,6 +54,21 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
     setErrorMessage("");
     setPreviewMessage("");
 
+    if (!company.trim()) {
+      setErrorMessage("会社名を入力してください。");
+      return;
+    }
+
+    if (!person.trim()) {
+      setErrorMessage("担当者名を入力してください。");
+      return;
+    }
+
+    if (!email.trim()) {
+      setErrorMessage("返信用メールアドレスを入力してください。");
+      return;
+    }
+
     if (!selection_result) {
       setErrorMessage("選考結果を選択してください。");
       return;
