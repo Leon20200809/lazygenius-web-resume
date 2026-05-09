@@ -54,9 +54,7 @@ export default async function ResumePage() {
 
             <div>
               <dt className="text-[var(--color-muted)]">通勤時間</dt>
-              <dd className="font-semibold">
-                {resume.profile.commuting_time}
-              </dd>
+              <dd className="font-semibold">{resume.profile.commuting_time}</dd>
             </div>
 
             <div>
@@ -108,14 +106,14 @@ export default async function ResumePage() {
           <h2 className="mb-4 text-xl font-bold">評価ポイント</h2>
 
           <ul className="space-y-2 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
-            <li>・小規模Webアプリの設計〜実装が可能</li>
-            <li>・認証 / フォーム / API連携 / 印刷対応</li>
-            <li>・Google Sheetsを用いたデータ管理</li>
-            <li>・Next.js / TypeScript を用いたWeb履歴書の構築</li>
+            <li>・小規模Webアプリの設計〜実装、デプロイまで対応</li>
+            <li>・認証 / フォーム / API連携 / メール送信 / 印刷対応</li>
+            <li>・Google Sheetsを用いたデータ管理とコード分離</li>
+            <li>・Next.js / TypeScript を用いたWeb履歴書アプリの構築</li>
           </ul>
 
           <p className="mt-4 text-xs text-[var(--color-muted)]">
-            Next.js（App Router）/ TypeScript / Google Sheets（CSV）/ Vercel
+            Next.js（App Router）/ TypeScript / Google Sheets（CSV）/ Resend / Vercel
           </p>
         </section>
 
