@@ -17,7 +17,10 @@ ${values.interview_dates}
 ${values.passed_note}
 
 ご都合のよい日程がございましたら、ご返信いただけますと幸いです。
-何卒よろしくお願いいたします。`;
+何卒よろしくお願いいたします。
+
+【返信用メールアドレス】
+${values.email}`;
   }
 
   if (values.selection_result === "rejected") {
@@ -36,7 +39,10 @@ ${values.rejection_reason}
 ${values.improvement_points}
 
 貴重なお時間をいただき、ありがとうございました。
-今後のご活躍をお祈り申し上げます。`;
+今後のご活躍をお祈り申し上げます。
+
+【返信用メールアドレス】
+${values.email}`;
   }
 
   return "";
