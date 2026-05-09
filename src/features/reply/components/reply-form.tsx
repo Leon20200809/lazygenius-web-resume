@@ -1,4 +1,8 @@
 // reply-form.tsx
+/**
+ * reply-form.tsx 400行ほどあり、state管理・文面生成・API送信・mailto起動・表示UIが同じコンポーネントに集まっている。
+  実務目線だと、この規模のTSXはどの単位で分割するのが自然か
+ */
 
 "use client";
 
@@ -29,6 +33,11 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
   const [copy_message, setCopyMessage] = useState("");
 
   const [error_message, setErrorMessage] = useState("");
+
+  const [is_sending, setIsSending] = useState(false);
+  const [is_sent, setIsSent] = useState(false);
+  const [send_success_message, setSendSuccessMessage] = useState("");
+  const [send_error_message, setSendErrorMessage] = useState("");
 
   // 2. 表示用の変数
   let selection_fields: ReactNode = null;
@@ -122,18 +131,52 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
    * fetchでAPIエンドポイントへPOST送信 /api/reply
    */
   const handleApiSend = async () => {
+    if (!preview_message) {
+      setErrorMessage("先に文面を生成してください。");
+      return;
+    }
+
+    if (is_sending || is_sent) {
+      return;
+    }
+
+    setIsSending(true);
+    setIsSent(true);
+    setSendSuccessMessage("");
+    setSendErrorMessage("");
+    setErrorMessage("");
+
     const reply_api_endpoint = "/api/reply";
 
-    const response = await fetch(reply_api_endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        recruiter_message: preview_message,
-      }),
-    });
-    const result = await response.json();
+    try {
+      const response = await fetch(reply_api_endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recruiter_message: preview_message,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setSendErrorMessage(result.message || "送信に失敗しました。");
+        return;
+      }
+
+      setIsSent(true);
+      setSendSuccessMessage("送信しました。ご連絡ありがとうございます。");
+      console.log(result);
+    } catch (error) {
+      console.error("API送信エラー:", error);
+      setSendErrorMessage(
+        "通信エラーが発生しました。時間をおいて再度お試しください。",
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   // 4. 条件分岐でJSXを作る
@@ -320,10 +363,37 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
           <button
             type="button"
             onClick={handleApiSend}
+            disabled={is_sending}
             className="mt-6 w-full cursor-pointer rounded-[var(--radius-m)] bg-[var(--color-accent)] px-5 py-3 font-bold text-[var(--color-bg)] transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           >
-            APIにデータを送る
+            {is_sent
+              ? "送信完了"
+              : is_sending
+                ? "送信中..."
+                : "この内容で送信する"}
           </button>
+
+          {send_success_message && (
+            <p className="mt-3 text-sm font-bold text-emerald-400">
+              {send_success_message}
+            </p>
+          )}
+
+          {send_error_message && (
+            <p className="mt-3 text-sm font-bold text-red-400">
+              {send_error_message}
+            </p>
+          )}
+
+          <div className="mt-16 rounded-[var(--radius-m)] border border-[var(--color-border)] bg-[var(--color-bg)] p-4 text-sm leading-relaxed text-[var(--color-muted)]">
+            <p className="font-bold text-[var(--color-text)]">
+              自社のメールソフトから送信したい場合
+            </p>
+            <p className="mt-2">
+              社内共有用のCC追加、送信履歴の保存、会社指定のメール署名を使用したい場合は、
+              下のボタンからメールソフトを起動して送信できます。
+            </p>
+          </div>
 
           <button
             type="button"
@@ -332,7 +402,6 @@ export function ReplyForm({ recipientName, recipientEmail }: ReplyFormProps) {
           >
             メールソフトで送る
           </button>
-          
         </div>
       )}
     </section>

@@ -1,11 +1,9 @@
 // src/app/api/reply/route.ts
 /**
- * ブラウザ側のフォーム
-  ↓ fetchでPOST /api/reply
-  ↓ route.ts が受け取る JSONを読む
-  ↓ 最低限チェック
-  ↓ 今は console.log
-  ↓ ブラウザへ「受け取ったぞ」と返す
+ * 採用担当者が入力した返信本文を受け取り、バリデーション後にメール送信するAPIルート
+ *
+ * ブラウザ側の返信フォームから POST /api/reply を受け取り、
+ * recruiter_message を検査した上で、Resend経由でLeon.C宛に送信する。
  */
 
 import { sendRecruiterReplyMail } from "@/lib/send-recruiter-reply-mail";
