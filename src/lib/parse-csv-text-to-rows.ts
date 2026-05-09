@@ -1,6 +1,16 @@
 // parse-csv-text-to-rows.ts → CSV文字列を行データに変換
 import { parse } from "csv-parse/sync";
 
+/**
+ * CSV形式のテキストを解析し、ヘッダーをキーとしたオブジェクトの配列に変換する
+ * 
+ * @param {string} csv_text - 解析対象のCSV文字列
+ * @returns {Record<string, string>[]} 各行をオブジェクト形式（キー: 値）で格納した配列
+ * 
+ * @example
+ * // 入力: "id,name\n1,Tanaka"
+ * // 出力: [{ id: "1", name: "Tanaka" }]
+ */
 export function parseCsvTextToRows(csv_text: string): Record<string, string>[] {
   return parse(csv_text, {
     columns: true,

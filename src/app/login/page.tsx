@@ -13,10 +13,24 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+  /**
+   * ログインフォームの送信イベントを処理する
+   *
+   * @param {SubmitEvent<HTMLFormElement>} e - フォーム送信イベント
+   * @description
+   * 1. 標準のページ遷移を防止
+   * 2. 入力されたパスワードをAPIにPOST送信
+   * 3. 認証成功時はトップページへリダイレクト、失敗時はエラーメッセージを表示
+   */
   async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setMessage("");
+
+    if (!password) {
+      setMessage("パスワードを入力してください");
+      return;
+    }
 
     const response = await fetch("/api/login", {
       method: "POST",

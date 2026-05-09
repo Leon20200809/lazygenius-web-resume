@@ -8,6 +8,8 @@
   ↓ ブラウザへ「受け取ったぞ」と返す
  */
 
+import { sendRecruiterReplyMail } from "@/lib/send-recruiter-reply-mail";
+
 export async function POST(request: Request) {
   console.log("POSTリクエストを受け取りました");
 
@@ -49,6 +51,23 @@ export async function POST(request: Request) {
   }
 
   console.log("受け取った本文:", recruiter_message);
+
+  try {
+    await sendRecruiterReplyMail(recruiter_message);
+  } catch (error) {
+    console.error("メール送信に失敗しました:", error);
+
+    return Response.json(
+      {
+        message: "メール送信に失敗しました",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+
+  console.log("メール送信に成功しました");
 
   return Response.json({
     message: "返信内容を受け取りました",
