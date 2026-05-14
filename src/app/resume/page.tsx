@@ -101,20 +101,21 @@ export default async function ResumePage() {
           </p>
         </section>
 
-        {/* 評価ポイント */}
+        {/* 学び方・考え方 */}
         <section className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-m)]">
-          <h2 className="mb-4 text-xl font-bold">評価ポイント</h2>
+          <h2 className="mb-4 text-xl font-bold">学び方・考え方</h2>
+
+          <p className="mb-4 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
+            私は、単にコードを書くのではなく、仕組みを理解しながら作ることを重視しています。
+            実装中に生まれる違和感や疑問を放置せず、「なぜそうなるのか」を確認しながら改善を重ねています。
+          </p>
 
           <ul className="space-y-2 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
-            <li>・小規模Webアプリの設計〜実装、デプロイまで対応</li>
-            <li>・認証 / フォーム / API連携 / メール送信 / 印刷対応</li>
-            <li>・Google Sheetsを用いたデータ管理とコード分離</li>
-            <li>・Next.js / TypeScript を用いたWeb履歴書アプリの構築</li>
+            <li>・処理や構造を抽象化して整理すること</li>
+            <li>・実装中の違和感に気づき、原因を確認すること</li>
+            <li>・「なぜ？」を止めず、仕組みから理解すること</li>
+            <li>・作りながら理解し、次の実装に応用すること</li>
           </ul>
-
-          <p className="mt-4 text-xs text-[var(--color-muted)]">
-            Next.js（App Router）/ TypeScript / Google Sheets（CSV）/ Resend / Vercel
-          </p>
         </section>
 
         {/* 学歴 */}

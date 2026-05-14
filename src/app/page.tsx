@@ -25,13 +25,9 @@ export default async function Home() {
           ご覧いただきありがとうございます。
         </p>
 
-        {/* <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
-          仕組みで面倒を減らし、実務で使える形にするエンジニア
-        </p> */}
-
         <p className="mb-10 max-w-2xl text-[length:var(--fs-base)] leading-relaxed text-[var(--color-muted)]">
           PHP / WordPress / Laravel / Next.js を軸に、
-          小規模なWebサイト・Webアプリを構築しています。
+          業務効率化や情報整理につながるWebサイト・Webアプリを構築しています。
         </p>
 
         {/* 導線 */}
@@ -68,6 +64,64 @@ export default async function Home() {
             選考結果を連絡する
           </a>
         </div>
+
+        {/* このサイトの設計に興味がある採用担当者様へ */}
+        <details className="group mt-12 w-full rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] text-left shadow-[var(--shadow-m)]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-[var(--radius-l)] px-5 py-4 text-sm font-bold text-[var(--color-text)] transition hover:bg-[var(--color-bg-alt)] md:text-base">
+            <span>このサイトの設計に興味がある採用担当者様へ</span>
+
+            <span className="text-lg leading-none text-[var(--color-accent)] transition group-open:rotate-45">
+              ＋
+            </span>
+          </summary>
+
+          <div className="border-t border-[var(--color-border)] px-5 py-5">
+            <div className="space-y-5 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
+              <div>
+                <h2 className="mb-2 font-bold text-[var(--color-text)]">
+                  目的
+                </h2>
+                <p>
+                  このWeb履歴書システムは、応募者と採用担当者双方の確認コストを減らすために制作しました。
+                  履歴書・職務経歴書・Webプロフィール・選考結果フォームへの導線を1画面に集約しています。
+                </p>
+              </div>
+
+              <div>
+                <h2 className="mb-2 font-bold text-[var(--color-text)]">
+                  設計
+                </h2>
+                <p>
+                  表示内容はGoogle
+                  Sheetsで管理し、コードとデータを分離しています。
+                  文章修正や経歴更新は、コードを変更せずシート編集だけで対応できるようにしています。
+                </p>
+              </div>
+
+              <div>
+                <h2 className="mb-2 font-bold text-[var(--color-text)]">
+                  就職活動プロセスの効率化
+                </h2>
+                <p>
+                  求人情報を整理するLG Job
+                  Hunterと、経歴・スキル・制作物を共有するLG Web
+                  Resumeを組み合わせ、
+                  「探す・整理する・応募する・確認してもらう」流れの効率化を目指しています。
+                </p>
+              </div>
+
+              <div>
+                <h2 className="mb-2 font-bold text-[var(--color-text)]">
+                  使用技術
+                </h2>
+                <p>
+                  Next.js / TypeScript / Google Sheets CSV / Resend / Vercel /
+                  WordPress / PHP
+                </p>
+              </div>
+            </div>
+          </div>
+        </details>
 
         {/* 外部導線 */}
         <div className="mt-10">
