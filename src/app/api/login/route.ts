@@ -7,6 +7,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { getLoginRequestInfo } from "@/lib/get-login-request-info";
+import { sendLoginSuccessMail } from "@/lib/send-login-success-mail";
+
 const COOKIE_NAME = "lg_access_granted";
 
 export async function POST(request: NextRequest) {
@@ -15,13 +18,21 @@ export async function POST(request: NextRequest) {
   if (password !== process.env.ACCESS_PASSWORD) {
     return NextResponse.json(
       { success: false, message: "パスワードが違います" },
-      { status: 401 },
+      { status: 401 }
     );
+  }
+
+  const login_info = getLoginRequestInfo(request);
+
+  try {
+    await sendLoginSuccessMail(login_info);
+  } catch (error) {
+    console.error("ログイン成功通知メールの送信に失敗しました:", error);
   }
 
   const response = NextResponse.json({
     success: true,
-    message: "ログイン成功",
+    message: "ログイン成功"
   });
 
   response.cookies.set(COOKIE_NAME, "true", {
@@ -29,7 +40,7 @@ export async function POST(request: NextRequest) {
     sameSite: "lax",
     path: "/",
     // 秒×分×時間×日数
-    maxAge: 60 * 60 * 2 * 1,
+    maxAge: 60 * 60 * 2 * 1
   });
 
   return response;
