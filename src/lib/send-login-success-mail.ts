@@ -25,11 +25,21 @@ export async function sendLoginSuccessMail(login_info: LoginRequestInfo) {
     throw new Error("MAIL_TO is not set");
   }
 
+  const logged_at_jst = new Date(login_info.logged_at).toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
   const mail_body = `
 Webレジュメにログインがありました。
 
 日時:
-${login_info.logged_at}
+${logged_at_jst}
 
 IPアドレス:
 ${login_info.ip_address}
@@ -50,7 +60,7 @@ ${login_info.region}
 ${login_info.city}
 
 タイムゾーン:
-${login_info.timezone}
+Asia/Tokyo
 `.trim();
 
   await resend.emails.send({

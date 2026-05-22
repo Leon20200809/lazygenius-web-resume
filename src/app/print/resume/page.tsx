@@ -46,7 +46,15 @@ export default async function PrintResumePage() {
               </div>
 
               <div className="flex h-[128px] items-center justify-center border border-black text-[11px] text-gray-500">
-                写真
+                {resume.profile.photo_url ? (
+                  <img
+                    src={resume.profile.photo_url}
+                    alt={`${resume.profile.name}の証明写真`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  "写真"
+                )}
               </div>
             </div>
           </section>
