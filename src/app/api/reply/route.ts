@@ -8,6 +8,9 @@
 
 import { sendRecruiterReplyMail } from "@/lib/send-recruiter-reply-mail";
 
+const DEVELOPER_MESSAGE =
+  "DevTools等からの直接リクエストまで確認していただきありがとうございます。このAPIでは、フロントエンド側の必須チェックを信用しすぎず、サーバー側でも入力値を検証しています。こうした実装意図に気づいてくださる方と、ぜひ設計についてお話ししてみたいです。";
+
 export async function POST(request: Request) {
   console.log("POSTリクエストを受け取りました");
 
@@ -18,33 +21,39 @@ export async function POST(request: Request) {
   if (typeof recruiter_message !== "string") {
     return Response.json(
       {
-        message: "本文の形式が正しくありません",
+        success: false,
+        message: "バリデーションエラー：本文の形式が正しくありません。",
+        developer_message: DEVELOPER_MESSAGE
       },
       {
-        status: 400,
-      },
+        status: 400
+      }
     );
   }
 
   if (recruiter_message.trim() === "") {
     return Response.json(
       {
-        message: "本文が空です",
+        success: false,
+        message: "バリデーションエラー：本文が空です。",
+        developer_message: DEVELOPER_MESSAGE
       },
       {
-        status: 400,
-      },
+        status: 400
+      }
     );
   }
 
   if (recruiter_message.length > 2000) {
     return Response.json(
       {
-        message: "本文が長すぎます",
+        success: false,
+        message: "バリデーションエラー：本文が長すぎます。",
+        developer_message: DEVELOPER_MESSAGE
       },
       {
-        status: 400,
-      },
+        status: 400
+      }
     );
   }
 
@@ -57,20 +66,22 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        message: "メール送信に失敗しました",
+        success: false,
+        message: "メール送信に失敗しました。"
       },
       {
-        status: 500,
-      },
+        status: 500
+      }
     );
   }
 
   console.log("メール送信に成功しました");
 
   return Response.json({
+    success: true,
     message: "返信内容を受け取りました",
     data: {
-      recruiter_message: recruiter_message,
-    },
+      recruiter_message: recruiter_message
+    }
   });
 }
