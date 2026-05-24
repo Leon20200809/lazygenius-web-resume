@@ -83,21 +83,22 @@ async function createSignature(
 
   const secret_key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(secret),
+    encoder.encode(secret), // 秘密鍵の文字列をバイト列に変換する
     {
-      name: "HMAC",
-      hash: "SHA-256"
+      name: "HMAC", // 秘密鍵付きの署名方式を指定する
+      hash: "SHA-256" // 署名計算に使うハッシュ方式
     },
     false,
-    ["sign"]
+    ["sign"] // 「署名（sign）に使う鍵だよ」と宣言
   );
 
   const signature = await crypto.subtle.sign(
     "HMAC",
     secret_key,
-    encoder.encode(payload)
+    encoder.encode(payload) // payload もバイト列に変換して署名する
   );
 
+  // クッキーに載せられる文字の形に変換
   return arrayBufferToBase64Url(signature);
 }
 
