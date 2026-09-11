@@ -1,6 +1,7 @@
 // src/app/print/resume/page.tsx
 import { buildResumeData } from "@/lib/build-resume-data";
 import { PrintButton } from "@/components/print/print-button";
+import Image from "next/image";
 
 export default async function PrintResumePage() {
   const resume = await buildResumeData();
@@ -47,10 +48,13 @@ export default async function PrintResumePage() {
 
               <div className="flex h-[128px] items-center justify-center border border-black text-[11px] text-gray-500">
                 {resume.profile.photo_url ? (
-                  <img
+                  <Image
                     src={resume.profile.photo_url}
                     alt={`${resume.profile.name}の証明写真`}
                     className="h-full w-full object-cover"
+                    width={96}
+                    height={128}
+                    unoptimized
                   />
                 ) : (
                   "写真"

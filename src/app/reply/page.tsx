@@ -1,32 +1,16 @@
-
-// src/app/reply/page.tsx
-
 import { ReplyForm } from "@/features/reply/components/reply-form";
+import Link from "next/link";
 
 export default function ReplyPage() {
-
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] px-6 py-12 text-[var(--color-text)]">
-      <div className="mx-auto max-w-3xl space-y-8">
-        {/* ヘッダー */}
-        <header className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">
-            Selection Reply
-          </p>
-
-          <h1 className="text-3xl font-bold md:text-4xl">
-            選考結果連絡フォーム
-          </h1>
-
-          <p className="max-w-2xl text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
-            書類選考の結果、面談日程のご相談、お見送りのご連絡を簡単に作成できます。
-            入力内容をもとに、Leon.C 宛の連絡文面を生成します。
-          </p>
+    <main id="main-content" className="min-h-dvh px-5 py-6 sm:px-8 sm:py-10">
+      <div className="mx-auto max-w-6xl">
+        <nav className="mb-14"><Link href="/" className="interactive text-sm font-semibold">← ホーム</Link></nav>
+        <header className="grid gap-8 border-b border-(--color-text) pb-12 lg:grid-cols-[.65fr_.35fr] lg:items-end">
+          <div><p className="eyebrow mb-4">Selection reply</p><h1 className="text-balance text-[clamp(2.8rem,7vw,5.8rem)] font-semibold leading-[.92] tracking-[-.065em]">選考結果の<br /><span className="text-(--color-accent)">ご連絡</span></h1></div>
+          <p className="max-w-[48ch] text-pretty leading-7 text-(--color-muted)">入力内容からLeon.C宛ての連絡文を作成し、内容を確認してから送信できます。</p>
         </header>
-
-        {/* フォームカード */}
         <ReplyForm recipientName="Leon.C" recipientEmail="info@lazygenius.dev" />
-
       </div>
     </main>
   );

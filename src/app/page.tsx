@@ -1,140 +1,36 @@
-// app/page.tsx
-// 役割: 採用担当者向けトップページ
-// - 履歴書PDF導線
-// - 職務経歴書PDF導線
-// - Web版プロフィール導線
-
 const CAREER_SHEET_PDF_PATH = process.env.GOOGLE_DOCUMENT_URL;
+
+const links = [
+  { href: "/resume", label: "Webプロフィール", note: "経歴・スキル・制作姿勢" },
+  { href: "/print/resume", label: "履歴書 PDF", note: "印刷・保存用のA4レイアウト", external: true },
+  { href: CAREER_SHEET_PDF_PATH, label: "職務経歴書 PDF", note: "業務経験と担当領域", external: true },
+  { href: "/reply", label: "選考結果を連絡", note: "採用担当者向けフォーム" },
+];
 
 export default async function Home() {
   return (
-    <main className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
-      <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
-        {/* 肩書き */}
-        <p className="mb-4 text-sm font-semibold tracking-[0.18em] text-[var(--color-accent)] uppercase">
-          Web Resume
-        </p>
-
-        {/* タイトル */}
-        <h1 className="mb-4 text-[length:var(--fs-2xl)] font-bold tracking-tight">
-          Leon.C
-        </h1>
-
-        {/* キャッチ */}
-        <p className="mb-3 text-[length:var(--fs-lg)] font-semibold">
-          ご覧いただきありがとうございます。
-        </p>
-
-        <p className="mb-10 max-w-2xl text-[length:var(--fs-base)] leading-relaxed text-[var(--color-muted)]">
-          PHP / WordPress / Laravel / Next.js を軸に、
-          業務効率化や情報整理につながるWebサイト・Webアプリを構築しています。
-        </p>
-
-        {/* 導線 */}
-        <div className="grid w-full gap-4">
-          <a
-            href="/resume"
-            className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)] active:scale-[0.98]"
-          >
-            Web版プロフィールを見る
-          </a>
-
-          <a
-            href="/print/resume"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)] active:scale-[0.98]"
-          >
-            履歴書PDFを開く
-          </a>
-
-          <a
-            href={CAREER_SHEET_PDF_PATH}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-4 font-bold text-[var(--color-text)] shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-bg-alt)] active:scale-[0.98]"
-          >
-            職務経歴書PDFを開く
-          </a>
-
-          <a
-            href="/reply"
-            className="inline-flex w-full items-center justify-center rounded-[var(--radius-l)] bg-[var(--color-accent)] px-6 py-4 text-center font-bold text-slate-950 shadow-[var(--shadow-m)] transition duration-[var(--dur)] ease-[var(--ease)] hover:bg-[var(--color-accent-hover)] hover:brightness-110 active:scale-[0.98]"
-          >
-            選考結果を連絡する
-          </a>
-        </div>
-
-        {/* このサイトの設計に興味がある採用担当者様へ */}
-        <details className="group mt-12 w-full rounded-[var(--radius-l)] border border-[var(--color-border)] bg-[var(--color-surface)] text-left shadow-[var(--shadow-m)]">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-[var(--radius-l)] px-5 py-4 text-sm font-bold text-[var(--color-text)] transition hover:bg-[var(--color-bg-alt)] md:text-base">
-            <span>このサイトの設計に興味がある採用担当者様へ</span>
-
-            <span className="text-lg leading-none text-[var(--color-accent)] transition group-open:rotate-45">
-              ＋
-            </span>
-          </summary>
-
-          <div className="border-t border-[var(--color-border)] px-5 py-5">
-            <div className="space-y-5 text-sm leading-relaxed text-[var(--color-muted)] md:text-base">
-              <div>
-                <h2 className="mb-2 font-bold text-[var(--color-text)]">
-                  目的
-                </h2>
-                <p>
-                  このWeb履歴書システムは、応募者と採用担当者双方の確認コストを減らすために制作しました。
-                  履歴書・職務経歴書・Webプロフィール・選考結果フォームへの導線を1画面に集約しています。
-                </p>
-              </div>
-
-              <div>
-                <h2 className="mb-2 font-bold text-[var(--color-text)]">
-                  設計
-                </h2>
-                <p>
-                  表示内容はGoogle
-                  Sheetsで管理し、コードとデータを分離しています。
-                  文章修正や経歴更新は、コードを変更せずシート編集だけで対応できるようにしています。
-                </p>
-              </div>
-
-              <div>
-                <h2 className="mb-2 font-bold text-[var(--color-text)]">
-                  就職活動プロセスの効率化
-                </h2>
-                <p>
-                  求人情報を整理するLG Job
-                  Hunterと、経歴・スキル・制作物を共有するLG Web
-                  Resumeを組み合わせ、
-                  「探す・整理する・応募する・確認してもらう」流れの効率化を目指しています。
-                </p>
-              </div>
-
-              <div>
-                <h2 className="mb-2 font-bold text-[var(--color-text)]">
-                  使用技術
-                </h2>
-                <p>
-                  Next.js / TypeScript / Google Sheets CSV / Resend / Vercel /
-                  WordPress / PHP
-                </p>
-              </div>
-            </div>
+    <main id="main-content" className="min-h-dvh px-5 py-6 sm:px-8 sm:py-10">
+      <div className="mx-auto grid min-h-[calc(100dvh-3rem)] max-w-6xl overflow-hidden rounded-[1.8rem] border border-(--color-border) bg-(--color-surface) shadow-(--shadow-l) lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="flex flex-col justify-between p-7 sm:p-12 lg:p-16">
+          <div className="flex items-center justify-between gap-4"><p className="eyebrow">Leon.C / Web resume</p><span className="font-mono text-xs text-(--color-muted)">TOKYO · 2026</span></div>
+          <div className="my-20 max-w-2xl lg:my-28">
+            <p className="mb-5 text-sm font-semibold text-(--color-muted)">Web制作・保守改善・自動化</p>
+            <h1 className="text-balance text-[clamp(3.4rem,10vw,7.5rem)] font-semibold leading-[0.84] tracking-[-0.075em]">小さく作り、<br /><span className="text-(--color-accent)">長く育てる。</span></h1>
+            <p className="mt-8 max-w-[58ch] text-pretty text-base leading-8 text-(--color-muted) sm:text-lg">PHP / WordPress / JavaScriptを軸に、運用する人が迷わず使え、あとから改善しやすいWebサイトと仕組みを作っています。</p>
           </div>
-        </details>
-
-        {/* 外部導線 */}
-        <div className="mt-10">
-          <a
-            href="https://lazygenius.dev"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold text-[var(--color-accent)] underline underline-offset-4 transition hover:text-[var(--color-accent-hover)]"
-          >
-            設計思想・制作実績を見る（個人サイト）
-          </a>
-        </div>
-      </section>
+          <a href="https://lazygenius.dev" target="_blank" rel="noopener noreferrer" className="interactive w-fit border-b border-current pb-1 text-sm font-semibold hover:text-(--color-accent)">制作実績を見る ↗</a>
+        </section>
+        <aside className="flex flex-col bg-(--color-surface-strong) p-5 text-[#f7f3e9] sm:p-8 lg:p-10">
+          <p className="mb-10 font-mono text-xs uppercase tracking-[0.16em] text-[#aeb9b1]">Choose a document</p>
+          <nav aria-label="資料一覧" className="mt-auto space-y-3">
+            {links.map((link, index) => {
+              const disabled = !link.href;
+              return <a key={link.label} href={link.href || undefined} target={link.external && !disabled ? "_blank" : undefined} rel={link.external && !disabled ? "noopener noreferrer" : undefined} aria-disabled={disabled} className={`interactive group grid grid-cols-[2rem_1fr_auto] items-center gap-3 border-t border-white/15 px-1 py-5 ${disabled ? "cursor-not-allowed opacity-40" : "hover:border-[#d86d4f]"}`}><span className="font-mono text-xs text-[#87948c]">0{index + 1}</span><span><strong className="block text-base font-semibold">{link.label}</strong><small className="mt-1 block text-[#aeb9b1]">{link.note}</small></span><span aria-hidden className="text-xl text-[#d86d4f] transition-transform group-hover:translate-x-1">→</span></a>;
+            })}
+          </nav>
+          <details className="mt-10 border-t border-white/15 pt-5 text-sm text-[#aeb9b1]"><summary className="cursor-pointer font-semibold text-[#f7f3e9]">このサイトについて</summary><p className="mt-4 max-w-[42ch] leading-7">Google Sheetsで内容を管理し、表示・印刷・選考連絡までを一つの導線にまとめています。</p></details>
+        </aside>
+      </div>
     </main>
   );
 }
