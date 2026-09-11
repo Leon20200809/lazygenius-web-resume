@@ -46,7 +46,7 @@ export default async function PrintResumePage() {
                 </div>
               </div>
 
-              <div className="flex h-[128px] items-center justify-center border border-black text-[11px] text-gray-500">
+              <div className="flex h-32 items-center justify-center border border-black text-[11px] text-gray-500">
                 {resume.profile.photo_url ? (
                   <Image
                     src={resume.profile.photo_url}
