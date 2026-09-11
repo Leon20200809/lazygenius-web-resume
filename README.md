@@ -1,278 +1,178 @@
 # LazyGenius Web Resume
 
-このWebレジュメアプリは、就職活動における応募者・採用担当者双方の手間を減らすことを目的に制作しました。
+就職活動で使う経歴情報を、Web表示・A4印刷・選考結果の返信まで一つの導線にまとめたWebレジュメです。
 
-応募者はURLを共有するだけで、職務経歴・スキル・印刷用レジュメを提示できます。  
-採用担当者は内容確認後、Webサイト内のフォームから「書類通過」または「お見送り」の連絡を送信できるため、確認から連絡までの導線を1つの画面上で完結できます。
+履歴書データはGoogle Sheetsで管理し、アプリは公開CSVを取得して表示します。閲覧にはパスワード認証が必要で、採用担当者はログイン後にWebプロフィール、印刷用履歴書、職務経歴書、選考結果連絡フォームを利用できます。
 
----
+## 現在の構成
 
-## 目的
+- トップ：Webプロフィール、印刷用履歴書、職務経歴書、選考結果連絡への入口
+- ログイン：採用担当者向けのパスワード認証
+- Webプロフィール：プロフィール、職歴、学歴、資格をレスポンシブ表示
+- 印刷用履歴書：A4印刷・PDF保存向けレイアウト
+- 選考結果連絡：通過・見送りの文面生成、内容確認、Resend送信、メールソフト起動
 
-このアプリは、以下を目的として開発しています。
-
-- Web開発エンジニアとしてのスキルを証明する
-- 採用担当者・現場担当者が確認しやすい形で情報を整理する
-- 応募書類の更新・共有・印刷を効率化する
-- Google Sheetsでデータを管理し、コードと文章データを分離する
-- 採用担当者が選考結果を返信しやすい導線を用意する
-
----
-
-## 主な機能
-
-- Web上での職務経歴・スキル情報の表示
-- A4印刷・PDF出力を想定したレジュメページ
-- Google SheetsからCSV形式でデータ取得
-- CSVデータをTypeScriptの型に沿って整形
-- 採用担当者向けの返信フォーム
-- フォームからのメール送信
-- メールソフト起動による手動送信ルート
-- 環境変数による開発環境・本番環境の設定分離
-
----
+UIはモバイルファーストで構成し、画面幅に応じて1カラムと分割レイアウトを切り替えます。`100dvh`、可変タイポグラフィ、キーボードフォーカス、スキップリンク、`prefers-reduced-motion`にも対応しています。
 
 ## 使用技術
 
-- Next.js
-- TypeScript
-- React
-- Tailwind CSS
-- Google Sheets
-- CSV
-- Resend
+| 領域 | 技術 |
+| --- | --- |
+| フレームワーク | Next.js 16.3.3（App Router / Server Components / Route Handlers / Proxy） |
+| UI | React 19.2.4 |
+| 言語 | TypeScript 5 |
+| スタイル | Tailwind CSS v4 / CSSカスタムプロパティ |
+| CSV解析 | csv-parse 6.2.1 |
+| データ管理 | Google Sheets |
+| メール送信 | Resend 6.12.3 |
 
----
-
-## 技術選定の理由
-
-### Next.js
-
-本アプリは「表示速度」「構造の明確さ」「運用のしやすさ」を重視し、Next.jsを採用しました。
-
-- サーバーコンポーネントを前提とした構成により、データ取得と描画の責務を分離しやすい
-- ページ単位で構造を整理できるため、履歴書のような情報表示アプリと相性が良い
-- ビルドおよびデプロイが容易で、改修・公開のサイクルを高速化できる
-- API Routeを利用することで、フォーム送信処理も同一アプリ内で完結できる
-
----
-
-### TypeScript
-
-CSVから取得したデータを安全に扱うため、TypeScriptを採用しました。
-
-- データ構造を型として定義できる
-- CSVの列構成とアプリ側のデータ構造を対応させやすい
-- 変更時のミスを早期に検知しやすい
-- データ取得・変換・表示の責務を整理しやすい
-
----
-
-### Google Sheets + CSV
-
-データ管理にはGoogle Sheetsを採用し、CSV形式で取得しています。
-
-目的は「更新のしやすさ」と「運用コストの削減」です。
-
-- Google Sheetsを使うことで、エンジニアでなくても内容を編集できる
-- CSVとして取得することで、シンプルな構成を維持できる
-- データをコードから分離することで、デプロイなしで内容更新が可能になる
-- 履歴書・職務経歴書のマスターデータを管理しやすい
-
-この構成により、開発者だけに依存しない運用を目指しています。
-
----
-
-### Resend
-
-採用担当者向けフォームからのメール送信には、Resendを使用しています。
-
-- Next.jsのAPI Routeからメール送信処理を実行できる
-- フォーム送信後の成功・失敗を画面に反映できる
-- 将来的な通知機能や送信履歴管理にも拡張しやすい
-
----
+正確な依存バージョンは[`package.json`](./package.json)を参照してください。
 
 ## データフロー
 
-```txt
-Google Sheets（データ管理）
-↓
-CSVエクスポート
-↓
-fetch系関数（データ取得）
-↓
-parse系関数（構造変換）
-↓
-TypeScript型（データ構造の保証）
-↓
-Next.js Server Component（データ注入）
-↓
-UIコンポーネント（表示）
-```
-
-データ取得・変換・表示を分離することで、責務ごとの変更影響を限定しています。
-
----
-
-## フォーム送信フロー
+プロフィール、学歴、職歴、資格は、それぞれGoogle Sheetsのシートとして管理します。
 
 ```txt
-採用担当者がフォーム入力
-↓
-返信文面を生成
-↓
-fetchで /api/reply へPOST送信
-↓
-API Routeで本文を検証
-↓
-Resendでメール送信
-↓
-成功・失敗をJSONで返却
-↓
-画面側で送信結果を表示
+Google Sheets
+  ↓ 公開CSVを並列取得（fetchSheetCsv / cache: no-store）
+CSVテキスト
+  ↓ parseCsvTextToRows
+行データ（Record<string, string>[]）
+  ↓ 用途別のparse関数
+TypeScript型（Profile / Education / Career / Certification）
+  ↓ buildResumeDataでResumeDataへ統合
+Next.js Server Component
+  ↓
+Webプロフィール / 印刷用履歴書
 ```
 
-フォーム送信時には、以下のUXを実装しています。
+主な責務は次のように分離しています。
 
-- 送信中のボタン無効化
-- 送信完了後の再送信防止
-- 送信成功メッセージの表示
-- 送信失敗メッセージの表示
-- APIから返却されたメッセージの画面反映
-- 自社メールソフトから送信したい場合の代替導線
+| 場所 | 役割 |
+| --- | --- |
+| `src/lib/fetch-sheet-csv.ts` | Google SheetsからCSVを取得 |
+| `src/lib/parse-*.ts` | CSVを用途別のデータ構造へ変換 |
+| `src/types/` | 履歴書データの型定義 |
+| `src/lib/build-resume-data.ts` | 4シートを並列取得し`ResumeData`へ統合 |
+| `src/app/resume/page.tsx` | WebプロフィールをServer Componentで描画 |
+| `src/app/print/resume/page.tsx` | 印刷用履歴書をServer Componentで描画 |
 
----
+## ログイン認証
 
-## 責務分離
+`POST /api/login`で入力されたパスワードを`ACCESS_PASSWORD`と比較します。認証に成功すると、以下の情報を含むペイロードへ`LOGIN_COOKIE_SECRET`を使ってHMAC-SHA256署名を付け、`lg_access_granted` Cookieとして保存します。
 
-本アプリでは、各処理の責務を明確に分離しています。
+- 用途：`resume_access`
+- 発行時刻
+- 有効期限（2時間）
 
-| 領域       | 役割                                     |
-| ---------- | ---------------------------------------- |
-| fetch系    | 外部データ（Google Sheets）からCSVを取得 |
-| parse系    | CSVテキストをアプリ用データ構造に変換    |
-| types      | データ構造を型として定義し、整合性を保証 |
-| app        | ページ単位の構成とデータ取得を管理       |
-| components | UIの表示に専念                           |
-| api        | フォーム送信などサーバー側処理を担当     |
-| lib        | メール送信などの共通処理を管理           |
+Cookieは`httpOnly`、`sameSite=lax`、全パス対象で、本番環境では`secure`になります。`src/proxy.ts`はCookieの存在だけでなく、署名・用途・有効期限を検証し、無効な場合は`/login`へ戻します。
 
-この構成により、変更時の影響範囲を最小限に抑えることを意識しています。
+ログイン画面、ログインAPI、Next.js内部ファイル、favicon以外のアプリルートが保護対象です。
 
----
+## メール送信
 
-## 工夫したポイント
+Resendは2種類の通知に使用しています。
 
-- Google Sheetsをデータ管理画面として活用
-- CSV取得処理とパース処理を分離
-- TypeScriptで履歴書データの構造を明確化
-- Web表示用ページと印刷用ページを分離
-- A4印刷・PDF出力を前提にした画面設計
-- 応募活動で使いやすいURL共有型の構成
-- 採用担当者のレスポンス負荷を下げる連絡フォームの設置
-- フォーム送信後の成功・失敗表示
-- ボタン連打防止による二重送信対策
-- 環境変数による設定分離（開発 / 本番）
-- スプレッドシートIDやAPIキーの秘匿化
-- 自社メールソフトから送信したい場合の代替導線
-- Next.js Route Handlerでログイン認証・Cookie発行・アクセス情報取得を実装
-
----
-
-## 環境変数の設計
-
-Google SheetsのIDやGID、メール送信用のAPIキーは環境変数で管理しています。
-
-- `.env.local` に実値を保持
-- `.env.example` にはキーのみ定義
-- 命名規則を統一し、コードとの不整合を防止
-- 本番環境ではVercel側のEnvironment Variablesに設定
-
-環境変数の命名不一致による取得失敗を経験したため、  
-「環境とコードの契約」を明確にする設計を意識しています。
-
----
-
-## 今後の改善予定
-
-- ログインページのUI改善
-- READMEと開発ログのさらなる整備
-- 印刷レイアウトの調整
-- 職務経歴データの文章改善
-- データ構造のさらなる型定義整理
-- 返信フォームコンポーネントの分割
-- バリデーション処理の整理
-- 必要に応じてDB化・API化を検討
-
----
-
-## Development
-
-### インストール
-
-```bash
-npm install
-```
-
-### 開発サーバー起動
-
-```bash
-npm run dev
-```
-
-ブラウザで以下にアクセスします。
+### 選考結果の返信
 
 ```txt
-http://localhost:3000
+採用担当者がフォームを入力
+  ↓
+ブラウザで返信文面を生成・確認
+  ↓ POST /api/reply
+Route Handlerで本文の型・空文字・文字数を検証
+  ↓
+ResendでLeon.C宛てに送信
+  ↓
+成功・失敗を画面へ表示
 ```
 
-### ビルド
+Webフォームを使わず、生成した文面をコピーするか、メールソフトを起動して送る代替導線もあります。送信中のボタン無効化と送信完了後の再送信防止を実装しています。
 
-```bash
-npm run build
+### ログイン成功通知
+
+ログイン成功時に、日時、IPアドレス、User-Agent、推定デバイス、Vercelの地域ヘッダーを通知メールとして送ります。通知送信に失敗した場合はサーバーログへ記録し、ログイン処理自体は継続します。
+
+## ディレクトリ構成
+
+```txt
+src/
+├─ app/
+│  ├─ api/
+│  │  ├─ login/route.ts       # ログインと署名付きCookie発行
+│  │  └─ reply/route.ts       # 返信本文の検証とメール送信
+│  ├─ login/page.tsx          # ログイン画面
+│  ├─ resume/page.tsx         # Webプロフィール
+│  ├─ print/resume/page.tsx   # A4印刷用履歴書
+│  ├─ reply/page.tsx          # 選考結果連絡画面
+│  ├─ globals.css             # Tailwind CSSとデザイントークン
+│  └─ page.tsx                # トップ
+├─ components/                # 共通UI
+├─ features/reply/            # 返信フォームと文面生成
+├─ lib/                       # CSV取得・解析・統合・メール送信
+├─ types/                     # 履歴書データ型
+└─ proxy.ts                   # 署名付きCookieの検証
 ```
 
-### 本番起動
+## 環境変数
 
-```bash
-npm run start
-```
-
----
-
-## Environment Variables
-
-環境変数は `.env.local` に設定します。
+`.env.example`をコピーして`.env.local`を作成し、実値を設定します。
 
 ```bash
 cp .env.example .env.local
 ```
 
-必要な値を設定してから開発サーバーを起動してください。
+| 変数 | 用途 |
+| --- | --- |
+| `ACCESS_PASSWORD` | ログイン画面で照合するパスワード |
+| `LOGIN_COOKIE_SECRET` | ログインCookieのHMAC-SHA256署名鍵 |
+| `GOOGLE_DOCUMENT_URL` | トップから開く職務経歴書のURL |
+| `GOOGLE_SHEETS_BASE_ID` | 履歴書データを置くスプレッドシートID |
+| `GOOGLE_SHEET_PROFILE_GID` | プロフィールシートのGID |
+| `GOOGLE_SHEET_EDUCATION_GID` | 学歴シートのGID |
+| `GOOGLE_SHEET_CAREER_GID` | 職歴シートのGID |
+| `GOOGLE_SHEET_CERTIFICATION_GID` | 資格シートのGID |
+| `RESEND_API_KEY` | Resend APIキー |
+| `MAIL_FROM` | Resendで使用する送信元 |
+| `MAIL_TO` | 返信・ログイン通知の送信先 |
 
-```env
-ACCESS_PASSWORD=
-GOOGLE_SHEETS_BASE_ID=
-GOOGLE_SHEET_PROFILE_GID=
-GOOGLE_SHEET_EDUCATION_GID=
-GOOGLE_SHEET_CAREERS_GID=
-GOOGLE_SHEET_CERTIFICATIONS_GID=
-RESEND_API_KEY=
-MAIL_FROM=
-MAIL_TO=
-NEXT_PUBLIC_SITE_URL=
+`LOGIN_COOKIE_SECRET`には、`ACCESS_PASSWORD`とは別の十分に長いランダム値を設定してください。秘密値をGitへコミットしないでください。`NODE_ENV`はNext.jsが管理するため、`.env.example`には含めていません。
+
+## 開発
+
+```bash
+npm install
+npm run dev
 ```
 
----
+開発サーバーは通常`http://localhost:3000`で起動します。
+
+```bash
+npm run lint
+npm run build
+npm run start
+```
+
+## 開発履歴
+
+- Google SheetsとCSVによるコンテンツ管理を実装
+- Web表示用とA4印刷用の履歴書を分離
+- 選考結果の文面生成、Resend送信、メールソフト送信を実装
+- HMAC-SHA256署名付きCookieによるログイン認証とログイン通知を実装
+- Taste / redesign skillを用いてUIをリニューアルし、機能を維持したままタイポグラフィ、配色、導線、レスポンシブ表示、アクセシビリティを改善
+
+## 現在の制約と改善候補
+
+- `src/app/print/career/page.tsx`はプレースホルダーで、職務経歴書は`GOOGLE_DOCUMENT_URL`の外部文書を使用しています
+- 自動テストは未導入のため、現状はESLintと本番ビルドで静的検証します
+- 返信フォームの補助コンポーネントは今後、実際の責務分割に合わせて整理できます
+
+DB化やAPI化は現在の要件では行わず、必要性が生じた場合に検討します。
 
 ## 開発方針
 
-このアプリでは、以下を重視しています。
-
-- まず最小構成で動かす
-- 動いた後に責務を整理する
-- データ取得・変換・表示を分ける
-- 手作業を減らす仕組みを作る
-- 採用担当者と応募者の双方にとって使いやすい導線を作る
-- 将来の修正に耐えられる構成を意識する
+- 最小で動かし、必要に応じて強くする
+- データ取得・変換・表示の責務を分ける
+- Google Sheetsを編集画面として活用し、コードと文章データを分離する
+- 採用担当者と応募者の双方が迷わない導線を作る
+- 秘密情報は環境変数で管理する

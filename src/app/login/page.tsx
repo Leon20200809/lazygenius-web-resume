@@ -30,21 +30,21 @@ export default function Page() {
       <section className="hidden flex-col justify-between rounded-[1.8rem] bg-(--color-surface-strong) p-12 text-[#f7f3e9] lg:flex">
         <p className="font-mono text-xs uppercase tracking-[.16em] text-[#aeb9b1]">Private access / Leon.C</p>
         <blockquote className="max-w-md text-4xl font-semibold leading-tight tracking-[-.045em]">必要な情報へ、<br /><span className="text-[#d86d4f]">迷わず進める</span>入口。</blockquote>
-        <p className="text-sm text-[#aeb9b1]">Recruiter access only</p>
+        <p className="text-sm text-[#aeb9b1]">Hiring team access</p>
       </section>
       <section className="flex items-center justify-center px-2 py-14 sm:px-10">
         <div className="w-full max-w-md">
           <Link href="/" className="interactive mb-16 inline-block text-sm font-semibold">← 戻る</Link>
           <p className="eyebrow mb-4">Authentication</p>
-          <h1 className="text-balance text-4xl font-semibold tracking-[-.05em] sm:text-5xl">採用担当者専用ページ</h1>
-          <p className="mt-5 max-w-[44ch] leading-7 text-(--color-muted)">履歴書・職務経歴書・選考連絡フォームをご覧いただけます。</p>
+          <h1 className="text-balance text-4xl font-semibold tracking-[-.05em] sm:text-5xl">採用・選考関係者向けページ</h1>
+          <p className="mt-5 max-w-[44ch] leading-7 text-(--color-muted)">認証後、任せられる仕事と実績、履歴書・職務経歴書、選考結果連絡フォームを確認できます。</p>
           <form onSubmit={handleSubmit} className="mt-12">
             <label htmlFor="password" className="text-sm font-semibold">パスワード</label>
             <input id="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="パスワードを入力" className="mt-3 w-full border-x-0 border-t-0 border-b border-(--color-border) bg-transparent px-0 py-4 text-lg outline-none transition-colors placeholder:text-(--color-muted)/60 focus:border-(--color-accent)" required />
             <div aria-live="polite" className="min-h-12 pt-3">{message && <p role="alert" className="text-sm font-medium text-(--color-danger)">{message}</p>}</div>
             <button type="submit" disabled={isSubmitting} className="interactive w-full cursor-pointer rounded-(--radius-m) bg-(--color-surface-strong) px-5 py-4 font-semibold text-white shadow-(--shadow-m) hover:bg-(--color-accent) disabled:cursor-wait disabled:opacity-60">{isSubmitting ? "確認しています…" : "認証して入る"}</button>
           </form>
-          <p className="mt-10 font-mono text-[10px] tracking-widest text-(--color-muted)">© 2026 LAZYGENIUSDEV</p>
+          <p className="mt-10 font-mono text-[10px] tracking-widest text-(--color-muted)">LAZYGENIUSDEV · SECURE ACCESS</p>
         </div>
       </section>
     </main>

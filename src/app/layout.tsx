@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: { default: "Leon.C Web Resume", template: "%s | Leon.C Web Resume" },
-  description: "Leon.Cの経歴、スキル、制作姿勢をまとめたWeb履歴書です。",
+  description: "Leon.Cに任せられる仕事、公開環境まで届ける実装力、業務上のメリット、GitHubで確認できる実績をまとめたWebレジュメです。",
 };
 
 export default function RootLayout({
