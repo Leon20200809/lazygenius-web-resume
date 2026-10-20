@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { SubmitEvent } from "react";
 
 export default function Page() {
-  const router = useRouter();
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,14 +21,14 @@ export default function Page() {
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password })
       });
       const result = await response.json();
       if (!response.ok) {
         setMessage(result.message ?? "ログインできませんでした。");
         return;
       }
-      router.push("/");
+      window.location.replace("/");
     } catch {
       setMessage("通信できませんでした。時間をおいて再度お試しください。");
     } finally {
