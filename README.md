@@ -176,3 +176,7 @@ DB化やAPI化は現在の要件では行わず、必要性が生じた場合に
 - Google Sheetsを編集画面として活用し、コードと文章データを分離する
 - 採用担当者と応募者の双方が迷わない導線を作る
 - 秘密情報は環境変数で管理する
+
+## Production WIF（Issue #1 第1段階）
+
+取得経路・環境変数名・オフライン検品・実認証の停止条件は [docs/production-wif.md](docs/production-wif.md) を参照。ローカルProduction identityは未確認のため、本実装ではローカルWIFを停止します。
