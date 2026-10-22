@@ -41,35 +41,54 @@ function validateConfig(config) {
   const canonical = configFrom({WIF_GCP_PROJECT_NUMBER: config?.number, WIF_GCP_PROJECT_ID: config?.project, WIF_TEST_SERVICE_ACCOUNT_EMAIL: config?.email});
   for (const key of ['audience','stsAudience','sheet','range']) if (config[key] !== canonical[key]) fail('CONFIG','TARGET_NOT_ALLOWED');
 }
-export async function runPoc({config, token, confirmBindingCleanup = false, fetchImpl = globalThis.fetch, now = Date.now()}) {
+async function request(stage, url, options, fetchImpl) {
+  let response;
+  try { response = await fetchImpl(url, {...options, redirect:'error', signal:AbortSignal.timeout(15000)}); }
+  catch { fail(stage,'NETWORK_OR_REDIRECT_OR_TIMEOUT'); }
+  if (!response.ok) {
+    const code = response.status === 401 ? 'HTTP_401' : response.status === 403 ? 'HTTP_403' : response.status === 400 ? 'HTTP_400_CHECK_AUDIENCE_OR_TRUST' : response.status === 429 ? 'HTTP_429' : 'HTTP_ERROR';
+    fail(stage,code); // Never inspect or print remote error bodies/statusText.
+  }
+  try { return await response.json(); } catch { fail(stage,'INVALID_JSON'); }
+}
+
+// STEP1: 既存の3交換を共用するだけで、認証方式・検証順・権限は変えない。
+// 入力はDev限定設定とOIDC資格、出力は短期SA資格。検証失敗時は固定コードで停止する。
+export async function authenticateDevelopment({config, token, confirmBindingCleanup = false, fetchImpl = globalThis.fetch, now = Date.now()}) {
   validateConfig(config);
   if (confirmBindingCleanup !== true) fail('LOCAL','BINDING_CLEANUP_UNCONFIRMED');
   checkToken(token, EXPECTED.sourceAudience, 'SOURCE', now);
-  async function request(stage, url, options) {
-    let response;
-    try { response = await fetchImpl(url, {...options, redirect:'error', signal:AbortSignal.timeout(15000)}); }
-    catch { fail(stage,'NETWORK_OR_REDIRECT_OR_TIMEOUT'); }
-    if (!response.ok) {
-      const code = response.status === 401 ? 'HTTP_401' : response.status === 403 ? 'HTTP_403' : response.status === 400 ? 'HTTP_400_CHECK_AUDIENCE_OR_TRUST' : response.status === 429 ? 'HTTP_429' : 'HTTP_ERROR';
-      fail(stage,code); // Never inspect or print remote error bodies/statusText.
-    }
-    try { return await response.json(); } catch { fail(stage,'INVALID_JSON'); }
-  }
   const json = body => ({method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const exchanged = await request('VERCEL_EXCHANGE','https://oidc.vercel.com/~token',json({token,aud:config.audience}));
+  // Vercel用audienceからDev provider標準audienceへ交換する。
+  const exchanged = await request('VERCEL_EXCHANGE','https://oidc.vercel.com/~token',json({token,aud:config.audience}),fetchImpl);
   checkToken(exchanged?.token,config.audience,'EXCHANGED',now);
+  // Google STSが署名・信頼条件を検証し、権限借用用の短期資格へ交換する。
   const sts = await request('STS','https://sts.googleapis.com/v1/token',json({
     grant_type:'urn:ietf:params:oauth:grant-type:token-exchange', audience:config.stsAudience,
     requested_token_type:'urn:ietf:params:oauth:token-type:access_token',
     subject_token_type:'urn:ietf:params:oauth:token-type:jwt',subject_token:exchanged.token,
     scope:'https://www.googleapis.com/auth/cloud-platform',
-  }));
+  }),fetchImpl);
   if (typeof sts?.access_token !== 'string' || !sts.access_token || typeof sts.token_type !== 'string' || sts.token_type.toLowerCase() !== 'bearer') fail('STS','INVALID_TOKEN_RESPONSE');
+  // Dev専用SAに限って権限を借用。最終資格はSheets読取専用、600秒。
   const impersonation = json({scope:[EXPECTED.scope],lifetime:'600s'});
   impersonation.headers.Authorization = `Bearer ${sts.access_token}`;
-  const sa = await request('IMPERSONATE',`https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(config.email)}:generateAccessToken`,impersonation);
+  const sa = await request('IMPERSONATE',`https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(config.email)}:generateAccessToken`,impersonation,fetchImpl);
   if (typeof sa?.accessToken !== 'string' || !sa.accessToken) fail('IMPERSONATE','INVALID_TOKEN_RESPONSE');
-  const result = await request('SHEETS',`https://sheets.googleapis.com/v4/spreadsheets/${EXPECTED.sheet}/values/${encodeURIComponent(EXPECTED.range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,{headers:{Authorization:`Bearer ${sa.accessToken}`}});
+  return sa.accessToken;
+}
+
+// 既存B2の確認は対象・判定・4通信の順序を変えない。
+export async function runPoc(options) {
+  const accessToken = await authenticateDevelopment(options);
+  const fetchImpl = options.fetchImpl ?? globalThis.fetch;
+  const result = await request('SHEETS',`https://sheets.googleapis.com/v4/spreadsheets/${EXPECTED.sheet}/values/${encodeURIComponent(EXPECTED.range)}?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,{headers:{Authorization:`Bearer ${accessToken}`}},fetchImpl);
   if (!Array.isArray(result?.values) || result.values.length !== 1 || !Array.isArray(result.values[0]) || result.values[0].length !== 1 || result.values[0][0] !== EXPECTED.value) fail('SHEETS','VALUE_MISMATCH');
   return 'PASS WIF_READ_OK';
+}
+
+// 学習用の固定ダミー範囲だけ。任意のsheet/range/URLを受け取らない。
+export async function readWalkthroughValues(accessToken, fetchImpl = globalThis.fetch) {
+  const result = await request('SHEETS',`https://sheets.googleapis.com/v4/spreadsheets/${EXPECTED.sheet}/values/WIF_TEST!D2%3AG10?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE`,{headers:{Authorization:`Bearer ${accessToken}`}},fetchImpl);
+  return result?.values;
 }
