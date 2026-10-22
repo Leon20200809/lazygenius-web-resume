@@ -57,7 +57,6 @@ export async function POST(request: Request) {
     );
   }
 
-  console.log("受け取った本文:", recruiter_message);
 
   try {
     await sendRecruiterReplyMail(recruiter_message);
