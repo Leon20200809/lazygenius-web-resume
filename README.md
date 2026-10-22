@@ -164,7 +164,7 @@ npm run start
 ## 現在の制約と改善候補
 
 - `src/app/print/career/page.tsx`はプレースホルダーで、職務経歴書は`GOOGLE_DOCUMENT_URL`の外部文書を使用しています
-- 自動テストは未導入のため、現状はESLintと本番ビルドで静的検証します
+- Production WIF/CSV変換はダミー・mockの自動テストを用意しています。実認証・ブラウザ・印刷の検品は別途必要です（[手順](docs/production-wif.md)）
 - 返信フォームの補助コンポーネントは今後、実際の責務分割に合わせて整理できます
 
 DB化やAPI化は現在の要件では行わず、必要性が生じた場合に検討します。
@@ -180,3 +180,5 @@ DB化やAPI化は現在の要件では行わず、必要性が生じた場合に
 ## Production WIF（Issue #1 第1段階）
 
 取得経路・環境変数名・オフライン検品・実認証の停止条件は [docs/production-wif.md](docs/production-wif.md) を参照。ローカルProduction identityは未確認のため、本実装ではローカルWIFを停止します。
+
+本番同等identityの実機検品は [Staged Production検品計画](docs/staged-production-wif.md) を参照。専用ブランチとDeployment IDを対応付け、実デプロイ・promote・公開停止はいずれも別承認です。現在は準備のみです。
