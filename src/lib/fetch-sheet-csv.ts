@@ -1,3 +1,7 @@
+import "server-only";
+import { sourceMode } from "./production-wif-core";
+import { fetchProductionSheetCsv } from "./production-sheet-csv";
+
 // fetch-sheet-csv.ts → 指定したシートのCSVを取るだけ
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_BASE_ID;
 
@@ -21,6 +25,10 @@ const SHEETS = {
 export async function fetchSheetCsv(
   sheetName: keyof typeof SHEETS
 ): Promise<string> {
+  // 明示したWIFが失敗した場合は停止。公開CSVへ自動で戻さない。
+  if (sourceMode(process.env.RESUME_SHEETS_SOURCE) === "wif") {
+    return fetchProductionSheetCsv(sheetName);
+  }
   const gid = SHEETS[sheetName];
   const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${gid}`;
 
