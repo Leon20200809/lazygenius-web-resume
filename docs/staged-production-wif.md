@@ -1,4 +1,29 @@
-# Staged Production WIF 検品計画（実行承認待ち）
+# Staged Production WIF：実施結果と事前計画
+
+## 現行状態：2026-10-23（司令官報告）
+
+| 項目 | 実施結果／根拠の範囲 |
+| --- | --- |
+| ソース | `work/issue-1-production-wif` の実装をmain `46cb79e`へ統合（実装 `8ffd2be`、手順 `2abbca9`） |
+| 初回Staged | 別フォルダへ `git archive HEAD` → `vercel link` → `vercel --prod --skip-domain`。Production identityを用いる実機検品を実施 |
+| 保護 | 未ログインのシークレットブラウザで固有URL・チーム別URLがVercel Authenticationを要求 |
+| アプリ | ログイン後 `/resume`・`/print/resume` が200。実データ・レイアウト・A4プレビュー正常を目視確認 |
+| 恒久設定 | Production限定のWIF用10項目を正式環境変数に追加し、既存12項目を保持（計22）。値は記録しない |
+| 公開切替 | main由来の新デプロイReadyと、青色Production表示の移動・公開先の正常表示をGUI確認。Promote相当の切替の記録であり、CLI alias等の厳密なDeployment ID照合は未実施 |
+| Sheets | 一般アクセス「制限付き」、本番SA閲覧者。「ウェブに公開」は「公開されていません」。非公開化後も本番表示正常 |
+| 匿名旧経路 | 確認した1つの旧CSV URLでGoogleログイン要求。全4 URLや他の公開経路の確認ではない |
+
+Production Branch（Branch Tracking）はmainを維持。**Auto-assign Custom Production Domainsは現在Disabled**です。前者は追跡ブランチ、後者は作成したデプロイへのカスタム本番ドメイン自動割当であり、別設定です。今後のDisabled継続方針は別判断とします。下の事前計画にある「Enabled維持」「恒久環境変数は変更しない」は当時の検品前提で、現在の設定ではありません。
+
+初回Stagedと公開先が同じDeployment IDだとは断定しません。今後もソースSHA・対象Deployment・設定と検品結果を照合し、main更新や新しいデプロイを「以前検品した成果物」と混同しません。実機確認は司令官の報告であり、LRが本番データを取得した証拠ではありません。
+
+現在の残件は、全4旧CSV URLの個別匿名拒否、プログラムによる旧新ResumeData完全同値、写真・外部文書等の個別公開経路監査、全シークレット非漏洩の完全証明、公開先Deployment IDの厳密照合です。目視・HTTP200・1 URLの拒否はそれぞれ確認した範囲に限定します。Issue #1は未完了です。
+
+## 履歴：以下は初回デプロイ前の計画（2026-10-22）
+
+以下の「現在」「今回」「まだデプロイ禁止」「未実測」は**初回実行前の時点**を指します。実施済み結果は上の表が優先します。ソースexport、秘密情報除外、保護確認、停止条件、promoteの別承認等の手順は再実施時も維持しますが、設定値やブランチ/Deploymentはその時点の承認対象へ読み替えて確認します。現在の正本は非公開なので、旧CSV方式へ戻すための再公開はしません。今後の設定変更・デプロイ・promoteは引き続き司令官の個別判断であり、この履歴は実行許可ではありません。
+
+---
 
 この文書は準備手順です。**Stagedを含むデプロイ、環境変数/IAM/共有設定の変更、mainマージ、promoteはまだ実行しません。** ローカル・PreviewのWIF停止条件は維持します。学習用PR #6はマージしません。
 
