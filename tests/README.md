@@ -1,4 +1,22 @@
-# Sheets values → CSV：第1段階の最小単位
+# オフライン検証：WIF固定取得と既存CSV契約
+
+## 公開CSV撤去版（2026-10-28）
+
+```sh
+npm ci
+node --import ./tests/register-ts-alias.mjs --test tests/sheet-values-to-csv.test.mjs tests/production-wif.test.mjs
+node --import ./tests/register-production-runtime-mocks.mjs --test tests/production-runtime.test.mjs
+npm run lint
+npx tsc --noEmit
+RESEND_API_KEY=re_dummy_build_only npm run build
+```
+
+- `production-runtime.test.mjs`：全4シートが動的実行・Cookie・Production identity境界を通ること、廃止済み取得元変数が未設定/旧値/不正値でも公開経路を復活させないことを検証。アプリのソース走査でも旧export URL・切替を検出します。
+- 認証不成立・Local/Preview・設定不足・Google拒否は停止。上流秘密の固定エラー化・無ログをダミーで検証します。全fetchはstubで、実通信・実メールは行いません。
+- `buildResumeData` の結果を4つの既存パーサーのローカルfixture結果と比較。旧公開取得コードは比較用にも残しません。アダプター単体は手書きCSVとの比較も維持します。
+- React cache・Next request APIはstubです。実リクエスト分離、実WIF、画面・印刷はこの試験の合格に含めません。Localで正本取得はできず、新Staged Productionの司令官検品が別途必要です。
+
+## 既存アダプター単体の範囲
 
 このファイルはPR #5で用意した純粋アダプターテストの範囲を説明します。2026-10-23の本番WIF移行・実機結果は [README](../README.md#検証本番運用2026-10-23時点) を参照してください。ここでの範囲外は「プロジェクト全体で未実施」を意味しません。Production経路と追加テスト・制約は [Production WIF設計](../docs/production-wif.md) を参照してください。
 

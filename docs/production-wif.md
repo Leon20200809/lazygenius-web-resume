@@ -12,7 +12,7 @@
 
 ## 現行の取得境界と停止条件
 
-既存の `fetchSheetCsv(): Promise<string>` → `buildResumeData()` → 4パーサー → 履歴書・印刷画面を維持し、取得方式だけをサーバー設定で選びます。第2・3段階のCSV削除・直接JSONパースは行いません。追加依存なし。
+既存の `fetchSheetCsv(): Promise<string>` → `buildResumeData()` → 4パーサー → 履歴書・印刷画面を維持し、取得をProduction WIF＋Sheets APIだけに固定します。第2・3段階のCSV削除・直接JSONパースは行いません。追加依存なし。
 
 **ローカルNext.jsが正規のProduction identityを取得する公式手順は未確認です。本実装はローカル・PreviewでWIF取得を停止します。** `vercel env pull --environment=production` がProduction subjectを発行するとは判断していません。`.env.wif.local` のDevelopment tokenやCLI資格情報は読みません。Productionトークンの貼付・コピー、環境フラグ偽装、Dev SAへの正本共有、IAMの緩和、鍵発行で迂回しないでください。
 
@@ -20,7 +20,7 @@
 
 ## 処理を追う順番
 
-1. `fetch-sheet-csv.ts`：`RESUME_SHEETS_SOURCE` 未指定は従来の公開CSV、明示 `public-csv` も同じ。`wif` の場合だけ新入口へ。他の値は停止。
+1. `fetch-sheet-csv.ts`：全4シートとも必ず `fetchProductionSheetCsv` へ委譲。公開CSV取得・取得元切替は存在せず、旧変数の未設定・旧値でもこの境界を迂回できない。
 2. `production-sheet-csv.ts`：`connection()` で実行時に限定し、既存CookieのHMAC署名・用途・期限を再検証。Vercel Production以外は停止。
 3. 同じリクエストの `x-vercel-oidc-token` を取得。環境変数・ファイル・CLI tokenへのfallbackなし。
 4. `production-wif-core.ts`：issuer/audience/owner/project/production subject/期限を前後で照合。Vercel audience交換 → Google STSの署名・信頼検証 → Production専用SAの短期token（Sheets read-only、600秒）。JWTのdecodeだけでは認証成功になりません。
@@ -42,8 +42,7 @@ React `cache` は同一サーバーレンダー内の短期認証共有だけで
 - `LOGIN_COOKIE_SECRET`
 - `ACCESS_PASSWORD`
 
-追加：
-- `RESUME_SHEETS_SOURCE`
+WIF取得に必要な追加設定：
 - `RESUME_WIF_VERCEL_TEAM`
 - `RESUME_WIF_VERCEL_PROJECT`
 - `RESUME_WIF_PROJECT_NUMBER`
@@ -85,17 +84,18 @@ npx tsc --noEmit
 
 受入項目：4シート同値性、職歴/学歴の並び、日付・先頭0・複数行・空欄・画像URL、ログイン後Web表示、A4印刷、エラー画面、匿名アクセス拒否。画像や文書URLが別途公開されている場合はSheetsの非公開化だけでは保護されないため、残る公開経路を別途点検します。
 
-## 切替と撤退条件（再実施時にも維持）
+## 公開CSV撤去版の切替と撤退条件（2026-10-28）
 
-以下は初回に設計した段階的な承認ゲートです。初回Stagedと最終公開先のDeployment IDが同一だったという実績の断定ではありません。今回の公開切替は新mainデプロイの青色Production表示と公開先表示で確認され、厳密なalias照合は残っています。正本は既に非公開化済みなので、現時点の撤退には下記の「公開停止後」を適用します。
+公開CSV取得・sourceModeを撤去し、旧 `RESUME_SHEETS_SOURCE` はコードと `.env.example` では不要です。ただしProduction登録値 `wif` は今は保持し、このPRでは削除・変更しません。旧Deploymentとの互換性を守ります。
 
+1. LRのmock検証・Draft PR → 司令官のLocal差分/テスト確認 → 司令官のmain統合。
+2. main由来の新Staged ProductionでソースSHA/Deployment ID、匿名拒否、WIF4枚、Web/A4、失敗時停止を検品。不明・失敗なら停止し、認証や共有条件を緩めない。
+3. 検品済み同一Deploymentを司令官がPromoteして公開先確認。現在のAuto-assign Disabledを変更しない。
+4. 新コードの非依存と正常公開を確認してから、司令官の別承認で旧変数を掃除。新PR統合・新Production検品の報告後だけIssue #1のCloseを判断。
 
-1. mock合格・差分承認 → 別承認後にStaged Production固有URLで保護・WIF・画面を検品 → さらに別承認で同じdeploymentをpromote。main統合と恒久設定の移行も別決裁。
-2. 認証付き4シート取得、ログイン後画面・印刷を確認。不一致/401/403/期限/metadata/ヘッダーエラーはSTOP。信頼条件は緩めない。
-3. 合格後、司令官だけがリンク共有を制限付きへ、必要なら「ウェブに公開」も停止。
-4. 匿名旧CSV/公開URLは取得不能、認証アプリは正常の双方を確認。
+旧公開CSV版へ戻しても非公開正本は取得できません。無断再公開はせず、認証版を修復するか停止を司令官が判断します。初回移行の過去手順は [Staged履歴](staged-production-wif.md) に保存し、現行手順と混同しません。
 
-公開停止前の撤退は、司令官が既存の承認済みdeploymentまたは明示的な公開CSV設定へ戻す判断をします。公開停止後は無断再公開せず、認証経路を修復するか停止表示とします。実装は自動で旧方式へ戻りません。
+全4旧URL・写真/外部Docs等の監査、values直接型変換は次の独立Issue候補です。旧URL匿名拒否は少なくとも1件の確認であり、全公開経路の監査完了を意味しません。完了コメントでは新Production検品の結果とこの範囲を分けます。
 
 ## 根拠と未検証の区別
 
@@ -105,4 +105,4 @@ npx tsc --noEmit
 - [Sheets values.get](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets.values/get)、[ValueRange](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets.values)：表示形式・末尾空行/列省略。数値/真偽値が返る場合は暗黙変換せず停止するため、実シートの型確認が必要。
 - 実施済み（司令官報告）：Production設定のGUI確認、WIFでの本番4シート取得を使う画面の正常表示、Web/A4プレビュー、正本非公開化後の表示、確認した1旧CSV URLの匿名拒否。
 - 未完了：全4旧CSV URLの個別拒否、旧新 `ResumeData` のプログラム完全同値、写真・外部文書等の公開経路監査、全シークレット非漏洩の完全証明、公開先Deployment IDの厳密照合。個別セル境界・メール副作用・実React cache分離など、目視表示だけでは証明できない検証も区別します。
-- 設定状況：Production Branch/mainとは別に、Auto-assign Custom Production DomainsはDisabled。継続方針は別判断。Issue #1は残件を含むため未完了です。
+- 設定状況：Production Branch/mainとは別に、Auto-assign Custom Production DomainsはDisabled。継続方針は別判断。Issue #1は新PR統合・新Production検品の報告と司令官の確定までCloseしません。

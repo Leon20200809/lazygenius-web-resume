@@ -1,6 +1,18 @@
 # Staged Production WIF：実施結果と事前計画
 
-## 現行状態：2026-10-23（司令官報告）
+## 公開CSV撤去版の現行手順（2026-10-28）
+
+この版の取得はWIFのみで、旧取得元切替はありません。LRは新ブランチ・offline検証・Draft PRまで、司令官はLocal確認後にmainへ統合し、**新main由来のStaged Production**を検品して同じDeploymentをPromoteします。過去の合格を新しい成果物の検品結果に流用しません。
+
+- 既存Production設定を保持。旧 `RESUME_SHEETS_SOURCE=wif` はこのPRでは変更・削除しません。新コードの非依存と正常公開を確認した後、司令官の別承認で掃除します。現行アプリの設定名は [取得境界](production-wif.md#設定名値をgitslackログへ貼らない) を参照。
+- Auto-assign Custom Production DomainsはDisabled。保護された固有URLで匿名拒否を先に確認し、ログイン後に4シート、`/resume`、`/print/resume`、A4、WIF失敗時停止を確認。ソースSHA・Deployment ID・公開先を照合します。
+- ローカル/Previewはfail-closed。token持出し・環境偽装・匿名取得・別認証へのfallbackは禁止。ローカルは差分とmockテストを確認し、実データ検品は司令官がStagedで行います。
+- 新PR統合・新Production検品の報告後に、確認範囲と次の独立Issue候補を整理し、司令官がIssue #1 Closeを確定します。今はCloseしません。
+- 旧Deploymentへ戻しても非公開正本の公開CSV取得は復旧しません。旧変数を先に消さず、無断再公開せず、認証版修復か停止を判断します。
+
+以降は**初回移行の実施記録と当時の旧方式の計画**です。旧取得元変数の追加や切替指示、初回公開停止などは現行の作業指示ではありません。ソースexport・秘密除外・保護確認・停止条件は再利用できますが、承認対象のSHA/Deploymentとこの現行手順を優先します。
+
+## 履歴：初回移行結果 2026-10-23（司令官報告）
 
 | 項目 | 実施結果／根拠の範囲 |
 | --- | --- |
@@ -17,7 +29,7 @@ Production Branch（Branch Tracking）はmainを維持。**Auto-assign Custom Pr
 
 初回Stagedと公開先が同じDeployment IDだとは断定しません。今後もソースSHA・対象Deployment・設定と検品結果を照合し、main更新や新しいデプロイを「以前検品した成果物」と混同しません。実機確認は司令官の報告であり、LRが本番データを取得した証拠ではありません。
 
-現在の残件は、全4旧CSV URLの個別匿名拒否、プログラムによる旧新ResumeData完全同値、写真・外部文書等の個別公開経路監査、全シークレット非漏洩の完全証明、公開先Deployment IDの厳密照合です。目視・HTTP200・1 URLの拒否はそれぞれ確認した範囲に限定します。Issue #1は未完了です。
+初回記録時の未確認事項は、全4旧CSV URLの個別匿名拒否、プログラムによる旧新ResumeData完全同値、写真・外部文書等の個別公開経路監査、全シークレット非漏洩の完全証明、公開先Deployment IDの厳密照合です。目視・HTTP200・1 URLの拒否はそれぞれ確認した範囲に限定します。これらの確認範囲を過大に一般化せず、今回のClose判断は冒頭の手順に従います。
 
 ## 履歴：以下は初回デプロイ前の計画（2026-10-22）
 

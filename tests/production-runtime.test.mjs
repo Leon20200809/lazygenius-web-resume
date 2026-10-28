@@ -1,12 +1,13 @@
 import test, { after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
 import { createHmac } from 'node:crypto';
 
 // すべて架空データ。実token・実Sheet・ネットワークは一切使用しない。
 const originalEnv = { ...process.env };
 const originalFetch = globalThis.fetch;
 const env = {
-  RESUME_SHEETS_SOURCE: 'wif', VERCEL: '1', VERCEL_ENV: 'production', NODE_ENV: 'production',
+  VERCEL: '1', VERCEL_ENV: 'production', NODE_ENV: 'production',
   LOGIN_COOKIE_SECRET: 'offline-dummy-cookie-secret',
   RESUME_WIF_VERCEL_TEAM: 'leon20200809s-projects', RESUME_WIF_VERCEL_PROJECT: 'lazygenius-web-resume',
   RESUME_WIF_PROJECT_NUMBER: '123456789', RESUME_WIF_PROVIDER_ID: 'vercel-production',
@@ -32,6 +33,7 @@ function cookie() {
 let calls;
 beforeEach(() => {
   Object.assign(process.env, env);
+  delete process.env.RESUME_SHEETS_SOURCE;
   globalThis.__resumeRuntime = { cookie: cookie(), token: jwt(), connections: 0 };
   calls = [];
   globalThis.fetch = async (...args) => { calls.push(args); throw new Error('OFFLINE_UNEXPECTED_FETCH'); };
@@ -52,10 +54,7 @@ const fixture = {
 function mockFlow(failStage) {
   globalThis.fetch = async (url, init) => {
     calls.push([url, init]);
-    if (String(url).startsWith('https://docs.google.com/')) {
-      assert.equal(process.env.RESUME_SHEETS_SOURCE, 'public-csv');
-      return new Response(sheetValuesToCsv(fixture[keys[Number(new URL(url).searchParams.get('gid'))]]));
-    }
+    assert.ok(!String(url).includes('docs.google.com'), 'public CSV request is forbidden');
     assert.equal(init.cache, 'no-store'); assert.equal(init.redirect, 'error');
     if (String(url).includes('oidc.vercel.com/~token')) return json({ token: jwt(JSON.parse(init.body).aud) });
     if (String(url).includes('sts.googleapis.com')) return failStage === 'sts' ? json({ secret: 'DO_NOT_ECHO' }, 403) : json({ access_token: 'DUMMY_STS', token_type: 'Bearer' });
@@ -69,14 +68,23 @@ function mockFlow(failStage) {
     throw new Error('OFFLINE_UNEXPECTED_URL');
   };
 }
-for (const source of [undefined, 'public-csv']) test(`public CSV compatibility: ${source ?? 'unset'}`, async () => {
-  if (source === undefined) delete process.env.RESUME_SHEETS_SOURCE; else process.env.RESUME_SHEETS_SOURCE = source;
-  globalThis.fetch = async (url, init) => { calls.push([url, init]); return new Response('key,value\r\nname,Dummy'); };
-  assert.equal(await fetchSheetCsv('profile'), 'key,value\r\nname,Dummy');
-  assert.equal(calls.length, 1); assert.match(calls[0][0], /docs\.google\.com.*gid=0$/); assert.deepEqual(calls[0][1], { cache: 'no-store' });
-  assert.equal(globalThis.__resumeRuntime.connections, 0);
+// 旧環境変数が残る既存Deploymentとの移行順を守りつつ、どの値でも旧経路を復活させない。
+for (const source of [undefined, '', 'public-csv', 'wif', 'typo']) test(`retired source setting cannot select a legacy path: ${source ?? 'unset'}`, async () => {
+  if (source !== undefined) process.env.RESUME_SHEETS_SOURCE = source;
+  mockFlow();
+  for (const key of keys) assert.equal(await fetchSheetCsv(key), sheetValuesToCsv(fixture[key]));
+  assert.equal(globalThis.__resumeRuntime.connections, 4);
+  assert.equal(calls.length, 20); // cache stubなので各シートで認証3段＋metadata＋values。
+  assert.ok(calls.every(([url]) => !String(url).includes('docs.google.com')));
 });
-test('invalid source stops before fetch', async () => { process.env.RESUME_SHEETS_SOURCE = 'typo'; await assert.rejects(fetchSheetCsv('profile'), { message: 'SHEETS_SOURCE_INVALID' }); assert.equal(calls.length, 0); });
+test('application source contains no public export URL or source selector', () => {
+  const root = new URL('../src/', import.meta.url);
+  for (const name of readdirSync(root, { recursive: true })) {
+    if (!/\.(ts|tsx)$/.test(name)) continue;
+    const source = readFileSync(new URL(name, root), 'utf8');
+    assert.doesNotMatch(source, /export\?format=csv|RESUME_SHEETS_SOURCE|sourceMode|public-csv/, name);
+  }
+});
 for (const value of [undefined, 'invalid']) test(`unauthenticated WIF stops before fetch: ${value ?? 'missing'}`, async () => {
   globalThis.__resumeRuntime.cookie = value; await assert.rejects(fetchSheetCsv('profile'), { message: 'RESUME_AUTH_REQUIRED' }); assert.equal(calls.length, 0);
 });
@@ -100,10 +108,44 @@ test('Google rejection after locally plausible claims never falls back to public
   mockFlow('sts'); await assert.rejects(fetchSheetCsv('profile'), { message: 'WIF_STS_HTTP_403' });
   assert.equal(calls.length, 2); assert.ok(calls.every(([url]) => !String(url).includes('docs.google.com')));
 });
-test('four dummy sheets produce identical ResumeData through public and WIF paths', async () => {
-  mockFlow(); const authenticated = await buildResumeData();
-  process.env.RESUME_SHEETS_SOURCE = 'public-csv'; const legacy = await buildResumeData();
-  // assertの差分対象も架空fixtureのみ。実個人データをこのテストへ入れない。
-  assert.deepEqual(authenticated, legacy); assert.equal(authenticated.education[0].id, '001');
-  assert.equal(authenticated.career[0].team_size, '03'); assert.equal(authenticated.education[0].summary, 'line1\nline2');
+test('four dummy sheets preserve the existing parser and ResumeData contract', async () => {
+  mockFlow();
+  const authenticated = await buildResumeData();
+  // 比較用のCSVはローカルfixtureから作る。旧公開取得コードをテストのために残さない。
+  const { parseProfileCsv } = await import('../src/lib/parse-profile-csv.ts');
+  const { parseEducationCsv } = await import('../src/lib/parse-education-csv.ts');
+  const { parseCareerCsv } = await import('../src/lib/parse-career-csv.ts');
+  const { parseCertificationCsv } = await import('../src/lib/parse-certification.ts');
+  const expected = {
+    profile: parseProfileCsv(sheetValuesToCsv(fixture.profile)),
+    education: parseEducationCsv(sheetValuesToCsv(fixture.education)),
+    career: parseCareerCsv(sheetValuesToCsv(fixture.career)),
+    certification: parseCertificationCsv(sheetValuesToCsv(fixture.certification)),
+  };
+  assert.deepEqual(authenticated, expected);
+  assert.equal(globalThis.__resumeRuntime.connections, 4);
+  const valueCalls = calls.filter(([url]) => String(url).includes('/values/'));
+  assert.equal(valueCalls.length, 4);
+  for (const key of keys) assert.ok(valueCalls.some(([url]) => decodeURIComponent(url).includes(`'${key}'!`)));
+  assert.equal(authenticated.education[0].id, '001');
+  assert.equal(authenticated.career[0].team_size, '03');
+  assert.equal(authenticated.education[0].summary, 'line1\nline2');
+});
+for (const key of keys) test(`missing WIF configuration fails closed: ${key}`, async () => {
+  delete process.env[`GOOGLE_SHEET_${key.toUpperCase()}_TITLE`];
+  await assert.rejects(fetchSheetCsv(key), { message: 'WIF_CONFIG_INVALID' });
+  assert.equal(calls.length, 0);
+});
+test('WIF failure emits neither upstream private response nor logs', async () => {
+  const logs = [];
+  const originals = { log: console.log, warn: console.warn, error: console.error };
+  try {
+    for (const name of Object.keys(originals)) console[name] = (...args) => logs.push(args);
+    mockFlow('sts');
+    await assert.rejects(buildResumeData(), { message: 'WIF_STS_HTTP_403' });
+    assert.deepEqual(logs, []);
+    assert.ok(calls.every(([url]) => !String(url).includes('docs.google.com')));
+  } finally {
+    Object.assign(console, originals);
+  }
 });

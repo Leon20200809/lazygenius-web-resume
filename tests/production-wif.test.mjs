@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createHmac } from "node:crypto";
 import { validResumeSession } from "../src/lib/resume-session.ts";
-import { readWifConfig, sourceMode, providerAudience, validateProductionToken, authenticateProduction, fetchPrivateSheetCsv } from "../src/lib/production-wif-core.ts";
+import { readWifConfig, providerAudience, validateProductionToken, authenticateProduction, fetchPrivateSheetCsv } from "../src/lib/production-wif-core.ts";
 import { parseProfileCsv } from "../src/lib/parse-profile-csv.ts";
 import { parseEducationCsv } from "../src/lib/parse-education-csv.ts";
 import { parseCareerCsv } from "../src/lib/parse-career-csv.ts";
@@ -43,10 +43,6 @@ function queueMock(items) {
 }
 const authResponses = () => [response({ token: jwt(claims(providerAudience(config))) }), response({ access_token: "DUMMY_STS", token_type: "Bearer" }), response({ accessToken: "DUMMY_SA", expireTime: new Date(Date.now()+600000).toISOString() })];
 
-test("explicit source defaults only when unset and rejects invalid values", () => {
-  assert.equal(sourceMode(undefined), "public-csv"); assert.equal(sourceMode("public-csv"), "public-csv"); assert.equal(sourceMode("wif"), "wif");
-  for (const value of ["", "WIF", " public-csv", "dummy", "https://example.invalid"]) assert.throws(() => sourceMode(value), { message: "SHEETS_SOURCE_INVALID" });
-});
 test("production configuration maps four distinct GIDs and fixed production pool", () => {
   assert.equal(Object.keys(config.sheets).length, 4);
   assert.equal(providerAudience(config), "https://iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/vercel-web-resume/providers/vercel-production");
