@@ -46,13 +46,13 @@ Profile / Education / Career / Certification
 Next.js Server Component → Webプロフィール / A4印刷用履歴書
 ```
 
-本番は `RESUME_SHEETS_SOURCE=wif`。WIFに失敗しても公開CSVへ自動フォールバックしません。旧公開CSV経路はコードに切替用として残っています（未指定または `public-csv`）。正本非公開化後の旧経路は復旧手段ではなく、無断で再公開しません。配列の直接変換やCSVライブラリの廃止は、今後の第2・3段階です。
+取得経路はProduction WIF＋Sheets APIだけです。公開CSV取得と取得元の切替分岐は撤去しました。認証失敗・設定不足・ローカル/Previewでは停止し、匿名URLや別の認証方式へフォールバックしません。CSVは中間形式として意図的に維持します。valuesの直接型変換やCSVライブラリ廃止は将来の別Issueです。
 
 主な責務は次のように分離しています。
 
 | 場所 | 役割 |
 | --- | --- |
-| `src/lib/fetch-sheet-csv.ts` | サーバー設定で取得経路を選び、CSV文字列の契約を維持 |
+| `src/lib/fetch-sheet-csv.ts` | 必ずProduction WIF入口へ委譲し、CSV文字列の契約を維持 |
 | `src/lib/production-sheet-csv.ts` | server-only入口、動的実行・Cookie再検証・Production制限 |
 | `src/lib/production-wif-core.ts` | OIDC照合・短期認証・Sheets API取得・GID/title/ヘッダー検査 |
 | `src/lib/sheet-values-to-csv.ts` | valuesを適切にエスケープしたCSVへ変換 |
@@ -145,7 +145,6 @@ cp .env.example .env.local
 | `GOOGLE_SHEET_EDUCATION_GID` | 学歴シートのGID |
 | `GOOGLE_SHEET_CAREER_GID` | 職歴シートのGID |
 | `GOOGLE_SHEET_CERTIFICATION_GID` | 資格シートのGID |
-| `RESUME_SHEETS_SOURCE` | 本番は `wif`。旧経路は `public-csv` または変数自体を未指定。空文字は無効 |
 | `RESUME_WIF_VERCEL_TEAM` | Production OIDCのチーム照合 |
 | `RESUME_WIF_VERCEL_PROJECT` | Production OIDCのプロジェクト照合 |
 | `RESUME_WIF_PROJECT_NUMBER` | Google Cloudプロジェクト番号 |
@@ -161,9 +160,9 @@ cp .env.example .env.local
 
 `LOGIN_COOKIE_SECRET`には、`ACCESS_PASSWORD`とは別の十分に長いランダム値を設定してください。秘密値をGitへコミットしないでください。`NODE_ENV`はNext.jsが管理するため、`.env.example`には含めていません。
 
-Production用の追加10項目（取得元1、WIF5、タイトル4）は、既存設定を保持して登録済みです（司令官報告）。`VERCEL` / `VERCEL_ENV` / `NODE_ENV`はプラットフォーム側の値であり、手入力で偽装しません。OIDCはリクエストの `x-vercel-oidc-token` から取得し、本番用トークンを環境変数へ保存しません。
+初回移行時はProduction用に10項目（当時の取得元1、WIF5、タイトル4）を追加しました（司令官報告）。現行コードに必要な追加設定はWIF5＋タイトル4です。廃止した取得元変数の本番登録は、下の移行順に従い今は保持します。`VERCEL` / `VERCEL_ENV` / `NODE_ENV`はプラットフォーム側の値であり、手入力で偽装しません。OIDCはリクエストの `x-vercel-oidc-token` から取得し、本番用トークンを環境変数へ保存しません。
 
-このアプリの `npm run dev` でProduction WIFを動かす経路はありません。DevダミーWIFの学習用CLI/PoCは別の検証成果物であり、本番コードへ取り込んでいません。`.env.wif.local`やDevelopment SAを本番に流用しません。テンプレートの `RESUME_SHEETS_SOURCE=` は空欄のまま実行できないため、ローカルの旧経路を明示する場合は `public-csv` と設定します。ただし非公開正本の取得はできません。まずは実データ不要のオフラインテストを使用してください。
+このアプリの `npm run dev` でProduction WIFを動かす経路はありません。DevダミーWIFの学習用CLI/PoCは別の検証成果物であり、本番コードへ取り込んでいません。`.env.wif.local`やDevelopment SAを本番に流用しません。ローカル・Previewで正本を取得する代替経路はありません。司令官のローカル確認は差分・ダミーのオフラインテストが対象で、実データの表示・印刷は新Staged Productionで検品します。
 
 ## 開発
 
@@ -205,19 +204,30 @@ mainへ統合したソース → Staged Production → 保護・実データ表�
 
 Production Branch（Branch Tracking）は `main`。これは追跡するブランチの設定です。別設定の `Auto-assign Custom Production Domains` は現在 **Disabled** で、自動ビルドと人間の公開判断を分離しています。Disabledを継続する運用判断は別途行います。ブランチ追跡、デプロイ作成、ドメイン割当、promoteは同じ操作ではありません。
 
-### Issue #1の残件
+### 公開CSV撤去版の安全な反映順（2026-10-28）
 
-- 全4旧CSV URLの個別匿名拒否試験（確認済みは1 URL）
-- 旧方式とWIF方式の `ResumeData` のプログラム完全同値比較（目視検品とは別）
-- 写真・外部職務経歴書・旧ファイル等、個別の公開経路監査
-- 全シークレット非漏洩の完全証明は未実施。エラー・ログ・キャッシュ等の確認範囲を区別する
-- 公開ドメインとDeployment IDの厳密照合、およびAuto-assign Disabledの継続方針
+1. LR：最新main起点の作業ブランチで実装・オフライン検証・Draft PR。司令官がローカルで差分とテストを確認。
+2. 司令官：採用したPRをmainへ統合。main由来の新Staged Productionを用意し、ソースSHAとDeployment IDを対応付ける。既存のProduction設定は削除しない。
+3. 新しい対象で匿名拒否、ログイン後の4シート・`/resume`・`/print/resume`・A4、WIF失敗時停止を検品。過去の検品を新コードの合格に流用しない。失敗・未確認ならPromoteしない。
+4. 司令官が検品済みの同じDeploymentをPromoteし、公開先を再確認。Auto-assign Custom Production DomainsはDisabledのまま。
+5. 正常公開と新コードが旧変数に依存しないことを確認してから、司令官の**別承認・操作**で旧 `RESUME_SHEETS_SOURCE` を削除可能。今はProduction登録値 `wif` を削除・変更しない（旧Deploymentとの互換性を守るため）。
+6. 新PR統合と新Production検品の報告後、確認範囲・別Issue候補を記した完了コメント案を司令官が確認してIssue #1 Closeを確定。このPRだけではCloseしない。
+
+旧Deploymentへのロールバックは、非公開正本の公開CSV取得を復旧しません。必要な旧設定を先に消さず、無断再公開や認証条件の緩和をせず、認証版の修復または停止を司令官が判断します。詳細は [Staged運用](docs/staged-production-wif.md) を参照してください。
+
+### 確認範囲と次の独立Issue候補
+
+- 旧CSVの匿名拒否は少なくとも1 URLを司令官が確認。全4 URLの個別確認や写真・外部文書・旧ファイル等の公開経路監査は別Issue候補。
+- values直接型変換・csv-parse廃止は別Issue。旧新 `ResumeData` の実データ完全同値比較も未実施で、ダミー契約試験・目視検品と区別する。
+- 全シークレット非漏洩の完全証明はしていない。今回の固定エラー・ログ・通信先のmock検証と実機確認の範囲を記録する。
+- 新公開先のソースSHA／Deployment ID照合は上の検品手順で行い、初回のGUI観測だけを厳密照合済みとは扱わない。
 
 正本のファイル名は整理し、古いマスターはゴミ箱へ移動しました（完全削除ではありません）。ファイル名変更はタブ名・ID変更とは別です。これらをもって全公開経路の監査完了やIssue完了とはしません。非公開化後の比較のために正本を再公開せず、安全な検証方法を別途判断します。
 
 ## 開発履歴
 
 - Google Sheetsと公開CSVによるコンテンツ管理を実装（初期構成）
+- 2026-10-28：公開CSV取得・切替分岐をコードから撤去（新Production検品・公開は司令官の別操作）
 - 2026-10-23：Production WIF・Sheets APIへ移行し、既存CSV変換/パーサーを維持したまま正本を非公開化
 - Web表示用とA4印刷用の履歴書を分離
 - 選考結果の文面生成、Resend送信、メールソフト送信を実装

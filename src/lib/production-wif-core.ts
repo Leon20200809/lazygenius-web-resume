@@ -15,11 +15,6 @@ const REQUIRED: Record<SheetKey, string[]> = {
   career: ["id", "status", "company", "period_start", "period_end", "employment_type", "role", "industry", "team_size", "summary", "challenge", "result", "achievements", "tech_stack", "print_summary", "sort"],
   certification: ["name", "acquired_date", "note", "sort"],
 };
-export function sourceMode(value: string | undefined): "public-csv" | "wif" {
-  if (value === undefined || value === "public-csv") return "public-csv";
-  if (value === "wif") return "wif";
-  throw new Error("SHEETS_SOURCE_INVALID");
-}
 /** 設定はサーバー環境だけから読む。Development SA/poolの転用や任意URLは受け付けない。 */
 export function readWifConfig(env: Record<string, string | undefined>): WifConfig {
   const required = (name: string) => { const value = env[name]; if (!value || value !== value.trim()) throw new Error("WIF_CONFIG_INVALID"); return value; };
